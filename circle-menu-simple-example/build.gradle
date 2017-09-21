@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion "26.0.1"
     defaultConfig {
-        applicationId "com.ramotion.circlemenu"
+        applicationId "com.ramotion.circlemenu.example.simple"
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 1

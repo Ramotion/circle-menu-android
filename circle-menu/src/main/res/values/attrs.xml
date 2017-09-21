@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CircleMenuView">
+        <attr name="button_icons" format="reference"/>
+        <attr name="button_colors" format="reference"/>
+    </declare-styleable>
+</resources>
