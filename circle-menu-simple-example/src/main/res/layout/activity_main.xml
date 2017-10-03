@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="false"
     tools:context="com.ramotion.circlemenu.example.simple.MainActivity">
 
     <com.ramotion.circlemenu.CircleMenuView

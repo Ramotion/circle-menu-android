@@ -11,6 +11,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,10 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class CircleMenuView extends FrameLayout {
+public class CircleMenuView extends FrameLayout implements View.OnClickListener {
 
     private FloatingActionButton mMenuButton;
     private RippleEffectView mRippleView;
+    private RingEffectView mRingView;
 
     private boolean mClosedState = true;
 
@@ -57,6 +59,9 @@ public class CircleMenuView extends FrameLayout {
                       @Nullable List<Integer> icons, @Nullable List<Integer> colors)
     {
         LayoutInflater.from(context).inflate(R.layout.circle_menu, this, true);
+
+        setClipChildren(false);
+        setClipToPadding(false);
 
         mMenuButton = findViewById(R.id.circle_menu_main_button);
         mRippleView = findViewById(R.id.circle_menu_ripple);
@@ -107,6 +112,8 @@ public class CircleMenuView extends FrameLayout {
             final FloatingActionButton button = new FloatingActionButton(context);
             button.setImageResource(icons.get(i));
             button.setBackgroundTintList(ColorStateList.valueOf(colors.get(i)));
+            button.setClickable(true);
+            button.setOnClickListener(this);
             button.setScaleX(0);
             button.setScaleY(0);
             button.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -114,11 +121,16 @@ public class CircleMenuView extends FrameLayout {
             addView(button);
             mButtons.add(button);
         }
-    }
 
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
+        final float density = context.getResources().getDisplayMetrics().density;
+        final int buttonSize = (int) (density * 56);
+        final int size = (int) (buttonSize + buttonSize * 2f);
+
+        mRingView = new RingEffectView(context);
+        mRingView.setStrokeColor(Color.RED);
+        mRingView.setStrokeWidth(buttonSize);
+        mRingView.setLayoutParams(new LayoutParams(size, size));
+        addView(mRingView);
     }
 
     @Override
@@ -132,8 +144,22 @@ public class CircleMenuView extends FrameLayout {
             button.setX(x);
             button.setY(y);
         }
+
+        mRingView.setX(getWidth() / 2 - mRingView.getWidth() / 2);
+        mRingView.setY(getHeight() / 2 - mRingView.getHeight() / 2);
     }
 
+    @Override
+    public void onClick(View view) {
+        final int buttonNumber = mButtons.indexOf(view) + 1;
+        final int stepAngle = 360 / mButtons.size();
+        final int startAngle = -90 - stepAngle + stepAngle * buttonNumber;
+
+        getRippleAnimation(view, 500).start();
+        getRingAnimation(startAngle, 500).start();
+    }
+
+    // TODO: add size parameter
     private ObjectAnimator getRippleAnimation(@NonNull View centerView, int duration) {
         final float centreX = centerView.getX() + centerView.getWidth()  / 2;
         final float centreY = centerView.getY() + centerView.getHeight() / 2;
@@ -142,9 +168,38 @@ public class CircleMenuView extends FrameLayout {
         mRippleView.setY(centreY - mRippleView.getHeight() / 2);
         mRippleView.setRadius(0);
 
-        final ObjectAnimator animation = ObjectAnimator.ofFloat(mRippleView, "radius", mRippleView.getWidth());
+        final ObjectAnimator animation = ObjectAnimator.ofFloat(mRippleView, "radius", mRippleView.getWidth() * 0.4f);
+        // TODO: add fade out animation
         animation.setDuration(duration);
+        animation.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                mRippleView.setVisibility(View.VISIBLE);
+            }
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mRippleView.setVisibility(View.INVISIBLE);
+            }
+        });
         return animation;
+    }
+
+    private AnimatorSet getRingAnimation(float startAngle, int duration) {
+        mRingView.setStartAngle(startAngle);
+        mRingView.setAngle(0);
+        mRingView.setAlpha(1f);
+        mRingView.setScaleX(1f);
+        mRingView.setScaleY(1f);
+
+        final ObjectAnimator angle = ObjectAnimator.ofFloat(mRingView, "angle", 360);
+        final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mRingView, "scaleX", 1f, 1.3f);
+        final ObjectAnimator scaleY = ObjectAnimator.ofFloat(mRingView, "scaleY", 1f, 1.3f);
+        final ObjectAnimator visible = ObjectAnimator.ofFloat(mRingView, "alpha", 1f, 0f);
+
+        final AnimatorSet set = new AnimatorSet();
+        set.play(scaleX).with(scaleY).with(visible).after(angle);
+        set.setDuration(duration);
+        return set;
     }
 
     private void startOpenMenuAnimation(int duration) {
@@ -166,7 +221,8 @@ public class CircleMenuView extends FrameLayout {
         final ObjectAnimator rotateAnimation = ObjectAnimator.ofPropertyValuesHolder(mMenuButton, pvhRotation);
         rotateAnimation.setDuration(duration / 2);
 
-        final int radius = mRippleView.getWidth() / 2 + mMenuButton.getWidth() / 2;
+//        final int radius = mRippleView.getWidth() / 2 + mMenuButton.getWidth() / 2;
+        final float radius = mMenuButton.getWidth() * 1.5f;
         final float centerX = mMenuButton.getX();
         final float centerY = mMenuButton.getY();
 
@@ -202,6 +258,7 @@ public class CircleMenuView extends FrameLayout {
 
         final AnimatorSet set = new AnimatorSet();
         set.playTogether(set1, rippleAnimation, buttonsAnimation);
+        set.setDuration(duration);
         set.start();
     }
 

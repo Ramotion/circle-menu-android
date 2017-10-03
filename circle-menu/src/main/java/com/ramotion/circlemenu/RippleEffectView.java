@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
-// FIXME: thin white line on max radius
 public class RippleEffectView extends View {
 
     private float mSize;
@@ -20,7 +19,7 @@ public class RippleEffectView extends View {
     private Paint mHolePaint;
 
     private float mRadius = 0f;
-    private float mRadiusDiff = 100f;
+    private float mRadiusDiff = 30;
 
     public RippleEffectView(@NonNull Context context) {
         super(context);
