@@ -16,6 +16,7 @@ import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -151,16 +152,17 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
     @Override
     public void onClick(View view) {
-        final int buttonNumber = mButtons.indexOf(view) + 1;
-        final int stepAngle = 360 / mButtons.size();
-        final int startAngle = -90 - stepAngle + stepAngle * buttonNumber;
+        final Animator ripple = getRippleAnimation(view);
+        final Animator ring = getRingAnimation((FloatingActionButton)view);
+        final Animator rotate = getButtonRotationAnimation((FloatingActionButton)view);
 
-        getRippleAnimation(view, 500).start();
-        getRingAnimation(startAngle, 500).start();
+        final AnimatorSet set = new AnimatorSet();
+        set.playTogether(ripple, ring, rotate);
+        set.setDuration(2000);
+        set.start();
     }
 
-    // TODO: add size parameter
-    private ObjectAnimator getRippleAnimation(@NonNull View centerView, int duration) {
+    private Animator getRippleAnimation(@NonNull View centerView) {
         final float centreX = centerView.getX() + centerView.getWidth()  / 2;
         final float centreY = centerView.getY() + centerView.getHeight() / 2;
 
@@ -169,8 +171,6 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         mRippleView.setRadius(0);
 
         final ObjectAnimator animation = ObjectAnimator.ofFloat(mRippleView, "radius", mRippleView.getWidth() * 0.4f);
-        // TODO: add fade out animation
-        animation.setDuration(duration);
         animation.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -184,12 +184,19 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         return animation;
     }
 
-    private AnimatorSet getRingAnimation(float startAngle, int duration) {
+    private Animator getRingAnimation(final @NonNull FloatingActionButton button) {
+        final int buttonNumber = mButtons.indexOf(button) + 1;
+        final int stepAngle = 360 / mButtons.size();
+        final int startAngle = -90 - stepAngle + stepAngle * buttonNumber;
+
+        final float elevation = ViewCompat.getElevation(button);
+
         mRingView.setStartAngle(startAngle);
         mRingView.setAngle(0);
         mRingView.setAlpha(1f);
         mRingView.setScaleX(1f);
         mRingView.setScaleY(1f);
+        mRingView.setStrokeColor(button.getBackgroundTintList().getDefaultColor());
 
         final ObjectAnimator angle = ObjectAnimator.ofFloat(mRingView, "angle", 360);
         final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mRingView, "scaleX", 1f, 1.3f);
@@ -198,8 +205,44 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
         final AnimatorSet set = new AnimatorSet();
         set.play(scaleX).with(scaleY).with(visible).after(angle);
-        set.setDuration(duration);
+        set.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                button.setCompatElevation(elevation + 2);
+                ViewCompat.setZ(mRingView, elevation + 1);
+            }
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                button.setCompatElevation(elevation);
+                ViewCompat.setZ(mRingView, elevation);
+            }
+        });
+
         return set;
+    }
+
+    private Animator getButtonRotationAnimation(final @NonNull FloatingActionButton button) {
+        final int buttonNumber = mButtons.indexOf(button) + 1;
+        final int stepAngle = 360 / mButtons.size();
+        final int startAngle = -90 - stepAngle + stepAngle * buttonNumber;
+
+        final float radius = mMenuButton.getWidth() * 1.5f;
+        final float x = (float) Math.cos(Math.toRadians(startAngle)) * radius;
+        final float y = (float) Math.sin(Math.toRadians(startAngle)) * radius;
+
+        button.setPivotX(button.getPivotX() - x);
+        button.setPivotY(button.getPivotY() - y);
+
+        final ObjectAnimator rotate = ObjectAnimator.ofFloat(button, "rotation", 0f, 360f);
+        rotate.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                button.setPivotX(button.getWidth() / 2);
+                button.setPivotY(button.getHeight() / 2);
+            }
+        });
+
+        return rotate;
     }
 
     private void startOpenMenuAnimation(int duration) {
@@ -221,7 +264,6 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         final ObjectAnimator rotateAnimation = ObjectAnimator.ofPropertyValuesHolder(mMenuButton, pvhRotation);
         rotateAnimation.setDuration(duration / 2);
 
-//        final int radius = mRippleView.getWidth() / 2 + mMenuButton.getWidth() / 2;
         final float radius = mMenuButton.getWidth() * 1.5f;
         final float centerX = mMenuButton.getX();
         final float centerY = mMenuButton.getY();
@@ -251,7 +293,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             }
         });
 
-        final ObjectAnimator rippleAnimation = getRippleAnimation(mMenuButton, duration);
+        final Animator rippleAnimation = getRippleAnimation(mMenuButton);
 
         final AnimatorSet set1 = new AnimatorSet();
         set1.play(alphaAnimation).before(rotateAnimation);
