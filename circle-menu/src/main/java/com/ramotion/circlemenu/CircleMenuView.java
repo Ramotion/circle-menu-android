@@ -71,12 +71,8 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             @Override
             public void onClick(View view) {
                 final int duration = 500;
-
-                if (mClosedState) {
-                    startOpenMenuAnimation(duration);
-                } else {
-                    startCloseMenuAnimation(duration);
-                }
+                final Animator animation = mClosedState ? getOpenMenuAnimation(duration) : getCloseMenuAnimation(duration);
+                animation.start();
             }
         });
 
@@ -153,12 +149,11 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     @Override
     public void onClick(View view) {
         final Animator ripple = getRippleAnimation(view);
-        final Animator ring = getRingAnimation((FloatingActionButton)view);
-        final Animator rotate = getButtonRotationAnimation((FloatingActionButton)view);
+        final Animator click = getButtonClickAnimation((FloatingActionButton)view);
 
         final AnimatorSet set = new AnimatorSet();
-        set.playTogether(ripple, ring, rotate);
-        set.setDuration(2000);
+        set.playTogether(ripple, click);
+        set.setDuration(500);
         set.start();
     }
 
@@ -184,10 +179,26 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         return animation;
     }
 
-    private Animator getRingAnimation(final @NonNull FloatingActionButton button) {
+    private Animator getButtonClickAnimation(final @NonNull FloatingActionButton button) {
         final int buttonNumber = mButtons.indexOf(button) + 1;
         final int stepAngle = 360 / mButtons.size();
         final int startAngle = -90 - stepAngle + stepAngle * buttonNumber;
+
+        final float radius = mMenuButton.getWidth() * 1.5f;
+        final float x = (float) Math.cos(Math.toRadians(startAngle)) * radius;
+        final float y = (float) Math.sin(Math.toRadians(startAngle)) * radius;
+
+        button.setPivotX(button.getPivotX() - x);
+        button.setPivotY(button.getPivotY() - y);
+
+        final ObjectAnimator rotateButton = ObjectAnimator.ofFloat(button, "rotation", 0f, 360f);
+        rotateButton.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                button.setPivotX(button.getWidth() / 2);
+                button.setPivotY(button.getHeight() / 2);
+            }
+        });
 
         final float elevation = ViewCompat.getElevation(button);
 
@@ -203,9 +214,12 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         final ObjectAnimator scaleY = ObjectAnimator.ofFloat(mRingView, "scaleY", 1f, 1.3f);
         final ObjectAnimator visible = ObjectAnimator.ofFloat(mRingView, "alpha", 1f, 0f);
 
-        final AnimatorSet set = new AnimatorSet();
-        set.play(scaleX).with(scaleY).with(visible).after(angle);
-        set.addListener(new AnimatorListenerAdapter() {
+        final AnimatorSet lastSet = new AnimatorSet();
+        lastSet.playTogether(scaleX, scaleY, visible, getCloseMenuAnimation(0));
+
+        final AnimatorSet firstSet = new AnimatorSet();
+        firstSet.playTogether(rotateButton, angle);
+        firstSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
                 button.setCompatElevation(elevation + 2);
@@ -218,34 +232,12 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             }
         });
 
-        return set;
+        final AnimatorSet clickAnimation = new AnimatorSet();
+        clickAnimation.play(firstSet).before(lastSet);
+        return clickAnimation;
     }
 
-    private Animator getButtonRotationAnimation(final @NonNull FloatingActionButton button) {
-        final int buttonNumber = mButtons.indexOf(button) + 1;
-        final int stepAngle = 360 / mButtons.size();
-        final int startAngle = -90 - stepAngle + stepAngle * buttonNumber;
-
-        final float radius = mMenuButton.getWidth() * 1.5f;
-        final float x = (float) Math.cos(Math.toRadians(startAngle)) * radius;
-        final float y = (float) Math.sin(Math.toRadians(startAngle)) * radius;
-
-        button.setPivotX(button.getPivotX() - x);
-        button.setPivotY(button.getPivotY() - y);
-
-        final ObjectAnimator rotate = ObjectAnimator.ofFloat(button, "rotation", 0f, 360f);
-        rotate.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                button.setPivotX(button.getWidth() / 2);
-                button.setPivotY(button.getHeight() / 2);
-            }
-        });
-
-        return rotate;
-    }
-
-    private void startOpenMenuAnimation(int duration) {
+    private Animator getOpenMenuAnimation(int duration) {
         mClosedState = false;
 
         final ObjectAnimator alphaAnimation = ObjectAnimator.ofFloat(mMenuButton, "alpha", 0.3f);
@@ -273,6 +265,14 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
         final ValueAnimator buttonsAnimation = ValueAnimator.ofFloat(0f, radius);
         buttonsAnimation.setDuration(duration);
+        buttonsAnimation.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                for (View view: mButtons) {
+                    view.setVisibility(View.VISIBLE);
+                }
+            }
+        });
         buttonsAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
@@ -294,24 +294,49 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         });
 
         final Animator rippleAnimation = getRippleAnimation(mMenuButton);
-
         final AnimatorSet set1 = new AnimatorSet();
         set1.play(alphaAnimation).before(rotateAnimation);
 
-        final AnimatorSet set = new AnimatorSet();
-        set.playTogether(set1, rippleAnimation, buttonsAnimation);
-        set.setDuration(duration);
-        set.start();
+        final AnimatorSet result = new AnimatorSet();
+        result.playTogether(set1, rippleAnimation, buttonsAnimation);
+        result.setDuration(duration);
+
+        return result;
     }
 
-    private void startCloseMenuAnimation(int duration) {
+    private Animator getCloseMenuAnimation(int duration) {
         mClosedState = true;
 
-        mMenuButton.setImageResource(R.drawable.ic_menu_black_24dp);
+        final ObjectAnimator scaleX1 = ObjectAnimator.ofFloat(mMenuButton, "scaleX", 0f);
+        final ObjectAnimator scaleY1 = ObjectAnimator.ofFloat(mMenuButton, "scaleY", 0f);
+        final ObjectAnimator alpha1 = ObjectAnimator.ofFloat(mMenuButton, "alpha", 0f);
+        final AnimatorSet set1 = new AnimatorSet();
+        set1.playTogether(scaleX1, scaleY1, alpha1);
+        set1.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                for (View view: mButtons) {
+                    view.setVisibility(View.INVISIBLE);
+                }
+            }
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mMenuButton.setRotation(30f);
+                mMenuButton.setImageResource(R.drawable.ic_menu_black_24dp);
+            }
+        });
 
-        final ObjectAnimator alphaAnimation = ObjectAnimator.ofFloat(mMenuButton, "alpha", 1f);
-        alphaAnimation.setDuration(duration);
-        alphaAnimation.start();
+        final ObjectAnimator angle = ObjectAnimator.ofFloat(mMenuButton, "rotation", 0);
+        final ObjectAnimator alpha2 = ObjectAnimator.ofFloat(mMenuButton, "alpha", 1f);
+        final ObjectAnimator scaleX2 = ObjectAnimator.ofFloat(mMenuButton, "scaleX", 1f);
+        final ObjectAnimator scaleY2 = ObjectAnimator.ofFloat(mMenuButton, "scaleY", 1f);
+        final AnimatorSet set2 = new AnimatorSet();
+        set2.playTogether(angle, alpha2, scaleX2, scaleY2);
+
+        final AnimatorSet result = new AnimatorSet();
+        result.play(set1).before(set2);
+        result.setDuration(duration);
+        return result;
     }
 
 }
