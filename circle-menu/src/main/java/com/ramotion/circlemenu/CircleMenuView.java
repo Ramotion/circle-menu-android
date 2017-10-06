@@ -20,6 +20,7 @@ import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
@@ -224,11 +225,13 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             public void onAnimationStart(Animator animation) {
                 button.setCompatElevation(elevation + 2);
                 ViewCompat.setZ(mRingView, elevation + 1);
+                ViewCompat.setZ(mRippleView, elevation + 3);
             }
             @Override
             public void onAnimationEnd(Animator animation) {
                 button.setCompatElevation(elevation);
                 ViewCompat.setZ(mRingView, elevation);
+                ViewCompat.setZ(mRippleView, elevation);
             }
         });
 
@@ -263,9 +266,9 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         final int buttonsCount = mButtons.size();
         final float angleStep = 360f / buttonsCount;
 
-        final ValueAnimator buttonsAnimation = ValueAnimator.ofFloat(0f, radius);
-        buttonsAnimation.setDuration(duration);
-        buttonsAnimation.addListener(new AnimatorListenerAdapter() {
+        final ValueAnimator buttonsAppear = ValueAnimator.ofFloat(0f, radius);
+        buttonsAppear.setDuration(duration);
+        buttonsAppear.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
                 for (View view: mButtons) {
@@ -273,7 +276,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
                 }
             }
         });
-        buttonsAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        buttonsAppear.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 final float fraction = valueAnimator.getAnimatedFraction();
@@ -287,19 +290,20 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
                     final View button = mButtons.get(i);
                     button.setX(centerX + x);
                     button.setY(centerY + y);
-                    button.setScaleX(fraction);
-                    button.setScaleY(fraction);
+                    button.setScaleX(1.0f * fraction);
+                    button.setScaleY(1.0f * fraction);
                 }
             }
         });
 
         final Animator rippleAnimation = getRippleAnimation(mMenuButton);
-        final AnimatorSet set1 = new AnimatorSet();
-        set1.play(alphaAnimation).before(rotateAnimation);
+        final AnimatorSet rippleSet = new AnimatorSet();
+        rippleSet.play(alphaAnimation).before(rotateAnimation);
 
         final AnimatorSet result = new AnimatorSet();
-        result.playTogether(set1, rippleAnimation, buttonsAnimation);
+        result.playTogether(rippleSet, rippleAnimation, buttonsAppear);
         result.setDuration(duration);
+        result.setInterpolator(new OvershootInterpolator());
 
         return result;
     }
