@@ -18,8 +18,8 @@ public class RippleEffectView extends View {
     private Paint mCirclePaint;
     private Paint mHolePaint;
 
-    private float mRadius = 0f;
-    private float mRadiusDiff = 30;
+    private float mCircleRadius = 0f;
+    private float mHoleRadius = 0f;
 
     public RippleEffectView(@NonNull Context context) {
         super(context);
@@ -59,28 +59,31 @@ public class RippleEffectView extends View {
     protected void onDraw(Canvas canvas) {
         final float center = mSize / 2;
 
-        final float circleRadius = Math.min(center, mRadius);
-        final float holeRadius = Math.min(center + mRadiusDiff, mRadius);
+        final float circleRadius = Math.min(center, mCircleRadius);
+        final float holeRadius = Math.min(center, mHoleRadius);
 
-        canvas.drawCircle(center, center, holeRadius - mRadiusDiff, mHolePaint); // hole
+        canvas.drawCircle(center, center, holeRadius, mHolePaint); // hole
         canvas.drawCircle(center, center, circleRadius, mCirclePaint); // circle
     }
 
-    public float getRadius() {
-        return mRadius;
+    public float getCircleRadius() {
+        return mCircleRadius;
     }
 
-    public void setRadius(float radius) {
-        mRadius = radius;
-        invalidate();
+    public void setCircleRadius(float radius) {
+        mCircleRadius = radius;
     }
 
-    public float getRadiusDiff() {
-        return mRadiusDiff;
+    public float getHoleRadius() {
+        return mHoleRadius;
     }
 
-    public void setRadiusDiff(float diff) {
-        mRadiusDiff = diff;
+    public void setHoleRadius(float radius) {
+        mHoleRadius = radius;
     }
 
+    public void reset() {
+        mCircleRadius = 0;
+        mHoleRadius = 0;
+    }
 }
