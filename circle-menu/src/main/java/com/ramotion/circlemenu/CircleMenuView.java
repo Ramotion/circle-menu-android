@@ -72,8 +72,8 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         mMenuButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                final int duration = 500;
-                final Animator animation = mClosedState ? getOpenMenuAnimation(duration) : getCloseMenuAnimation(duration);
+                final Animator animation = mClosedState ? getOpenMenuAnimation() : getCloseMenuAnimation();
+                animation.setDuration(500);
                 animation.start();
             }
         });
@@ -231,7 +231,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         final ObjectAnimator visible = ObjectAnimator.ofFloat(mRingView, "alpha", 1f, 0f);
 
         final AnimatorSet lastSet = new AnimatorSet();
-        lastSet.playTogether(scaleX, scaleY, visible, getCloseMenuAnimation(0));
+        lastSet.playTogether(scaleX, scaleY, visible, getCloseMenuAnimation());
 
         final AnimatorSet firstSet = new AnimatorSet();
         firstSet.playTogether(rotateButton, angle);
@@ -255,24 +255,24 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         return clickAnimation;
     }
 
-    private Animator getOpenMenuAnimation(int duration) {
+    private Animator getOpenMenuAnimation() {
         mClosedState = false;
 
         final ObjectAnimator alphaAnimation = ObjectAnimator.ofFloat(mMenuButton, "alpha", 0.3f);
-        alphaAnimation.setDuration(duration / 2);
-        alphaAnimation.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mMenuButton.setImageResource(R.drawable.ic_close_black_24dp);
-            }
-        });
 
         final Keyframe kf0 = Keyframe.ofFloat(0f, 0f);
-        final Keyframe kf1 = Keyframe.ofFloat(0.5f, 30f);
+        final Keyframe kf1 = Keyframe.ofFloat(0.5f, 60f);
         final Keyframe kf2 = Keyframe.ofFloat(1f, 0f);
         final PropertyValuesHolder pvhRotation = PropertyValuesHolder.ofKeyframe("rotation", kf0, kf1, kf2);
         final ObjectAnimator rotateAnimation = ObjectAnimator.ofPropertyValuesHolder(mMenuButton, pvhRotation);
-        rotateAnimation.setDuration(duration / 2);
+        rotateAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                if (valueAnimator.getAnimatedFraction() == 0.5f) {
+                    mMenuButton.setImageResource(R.drawable.ic_close_black_24dp);
+                }
+            }
+        });
 
         final float radius = mMenuButton.getWidth() * 1.5f;
         final float centerX = mMenuButton.getX();
@@ -282,7 +282,6 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         final float angleStep = 360f / buttonsCount;
 
         final ValueAnimator buttonsAppear = ValueAnimator.ofFloat(0f, radius);
-        buttonsAppear.setDuration(duration);
         buttonsAppear.setInterpolator(new OvershootInterpolator());
         buttonsAppear.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -315,17 +314,13 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
         final Animator rippleAnimation = getRippleAnimation(mMenuButton);
 
-        final AnimatorSet rotateSet = new AnimatorSet();
-        rotateSet.play(alphaAnimation).before(rotateAnimation);
-
         final AnimatorSet result = new AnimatorSet();
-        result.playTogether(rotateSet, rippleAnimation, buttonsAppear);
-        result.setDuration(duration);
+        result.playTogether(alphaAnimation, rotateAnimation, rippleAnimation, buttonsAppear);
 
         return result;
     }
 
-    private Animator getCloseMenuAnimation(int duration) {
+    private Animator getCloseMenuAnimation() {
         mClosedState = true;
 
         final ObjectAnimator scaleX1 = ObjectAnimator.ofFloat(mMenuButton, "scaleX", 0f);
@@ -342,7 +337,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             }
             @Override
             public void onAnimationEnd(Animator animation) {
-                mMenuButton.setRotation(30f);
+                mMenuButton.setRotation(60f);
                 mMenuButton.setImageResource(R.drawable.ic_menu_black_24dp);
             }
         });
@@ -352,11 +347,11 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         final ObjectAnimator scaleX2 = ObjectAnimator.ofFloat(mMenuButton, "scaleX", 1f);
         final ObjectAnimator scaleY2 = ObjectAnimator.ofFloat(mMenuButton, "scaleY", 1f);
         final AnimatorSet set2 = new AnimatorSet();
+        set2.setInterpolator(new OvershootInterpolator());
         set2.playTogether(angle, alpha2, scaleX2, scaleY2);
 
         final AnimatorSet result = new AnimatorSet();
         result.play(set1).before(set2);
-        result.setDuration(duration);
         return result;
     }
 
