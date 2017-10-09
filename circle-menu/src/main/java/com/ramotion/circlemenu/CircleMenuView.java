@@ -80,7 +80,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
                 }
 
                 final Animator animation = mClosedState ? getOpenMenuAnimation() : getCloseMenuAnimation();
-                animation.setDuration(500);
+                animation.setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime));
                 animation.start();
             }
         });
@@ -170,7 +170,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
         final AnimatorSet set = new AnimatorSet();
         set.playTogether(ripple, click);
-        set.setDuration(2000);
+        set.setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime));
         set.start();
     }
 
