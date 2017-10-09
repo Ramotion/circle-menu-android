@@ -12,6 +12,8 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.Rect;
+import android.os.Build;
 import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -136,6 +138,10 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
 
+        if (!mClosedState) {
+            return;
+        }
+
         final float x = mMenuButton.getX();
         final float y = mMenuButton.getY();
 
@@ -155,7 +161,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
         final AnimatorSet set = new AnimatorSet();
         set.playTogether(ripple, click);
-        set.setDuration(500);
+        set.setDuration(2000);
         set.start();
     }
 
@@ -200,7 +206,10 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         final int stepAngle = 360 / mButtons.size();
         final int startAngle = -90 - stepAngle + stepAngle * buttonNumber;
 
-        final float radius = mMenuButton.getWidth() * 1.5f;
+        final Rect buttonRect = new Rect();
+        mMenuButton.getContentRect(buttonRect);
+
+        final float radius = buttonRect.width() * 1.5f;
         final float x = (float) Math.cos(Math.toRadians(startAngle)) * radius;
         final float y = (float) Math.sin(Math.toRadians(startAngle)) * radius;
 
@@ -211,12 +220,12 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         rotateButton.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                button.setPivotX(button.getWidth() / 2);
-                button.setPivotY(button.getHeight() / 2);
+                button.setPivotX(buttonRect.width() / 2);
+                button.setPivotY(buttonRect.height() / 2);
             }
         });
 
-        final float elevation = ViewCompat.getElevation(button);
+        final float elevation = mMenuButton.getCompatElevation();
 
         mRingView.setStartAngle(startAngle);
         mRingView.setAngle(0);
@@ -238,9 +247,15 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         firstSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                button.setCompatElevation(elevation + 2);
-                ViewCompat.setZ(mRingView, elevation + 1);
-                ViewCompat.setZ(mRippleView, elevation + 3);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    bringChildToFront(mRingView);
+                    bringChildToFront(mRippleView);
+                    bringChildToFront(button);
+                } else {
+                    button.setCompatElevation(elevation + 2);
+                    ViewCompat.setZ(mRingView, elevation + 1);
+                    ViewCompat.setZ(mRippleView, elevation + 3);
+                }
             }
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -274,7 +289,10 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             }
         });
 
-        final float radius = mMenuButton.getWidth() * 1.5f;
+        final Rect buttonRect = new Rect();
+        mMenuButton.getContentRect(buttonRect);
+
+        final float radius = buttonRect.width() * 1.5f;
         final float centerX = mMenuButton.getX();
         final float centerY = mMenuButton.getY();
 
@@ -321,8 +339,6 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     }
 
     private Animator getCloseMenuAnimation() {
-        mClosedState = true;
-
         final ObjectAnimator scaleX1 = ObjectAnimator.ofFloat(mMenuButton, "scaleX", 0f);
         final ObjectAnimator scaleY1 = ObjectAnimator.ofFloat(mMenuButton, "scaleY", 0f);
         final ObjectAnimator alpha1 = ObjectAnimator.ofFloat(mMenuButton, "alpha", 0f);
@@ -352,6 +368,12 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
         final AnimatorSet result = new AnimatorSet();
         result.play(set1).before(set2);
+        result.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mClosedState = true;
+            }
+        });
         return result;
     }
 
