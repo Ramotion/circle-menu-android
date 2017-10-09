@@ -37,6 +37,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     private RingEffectView mRingView;
 
     private boolean mClosedState = true;
+    private boolean mIsAnimating = false;
 
     private final List<View> mButtons = new ArrayList<>();
 
@@ -74,6 +75,10 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         mMenuButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (mIsAnimating) {
+                    return;
+                }
+
                 final Animator animation = mClosedState ? getOpenMenuAnimation() : getCloseMenuAnimation();
                 animation.setDuration(500);
                 animation.start();
@@ -138,7 +143,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
 
-        if (!mClosedState) {
+        if (mIsAnimating) {
             return;
         }
 
@@ -156,6 +161,10 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
     @Override
     public void onClick(View view) {
+        if (mIsAnimating) {
+            return;
+        }
+
         final Animator ripple = getRippleAnimation(view);
         final Animator click = getButtonClickAnimation((FloatingActionButton)view);
 
@@ -190,10 +199,12 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         result.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
+                mIsAnimating = true;
                 mRippleView.setVisibility(View.VISIBLE);
             }
             @Override
             public void onAnimationEnd(Animator animation) {
+                mIsAnimating = false;
                 mRippleView.setVisibility(View.INVISIBLE);
             }
         });
@@ -265,9 +276,20 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             }
         });
 
-        final AnimatorSet clickAnimation = new AnimatorSet();
-        clickAnimation.play(firstSet).before(lastSet);
-        return clickAnimation;
+        final AnimatorSet result = new AnimatorSet();
+        result.play(firstSet).before(lastSet);
+        result.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                mIsAnimating = true;
+            }
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mIsAnimating = false;
+            }
+        });
+
+        return result;
     }
 
     private Animator getOpenMenuAnimation() {
@@ -334,11 +356,23 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
         final AnimatorSet result = new AnimatorSet();
         result.playTogether(alphaAnimation, rotateAnimation, rippleAnimation, buttonsAppear);
+        result.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                mIsAnimating = true;
+            }
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mIsAnimating = false;
+            }
+        });
 
         return result;
     }
 
     private Animator getCloseMenuAnimation() {
+        mClosedState = true;
+
         final ObjectAnimator scaleX1 = ObjectAnimator.ofFloat(mMenuButton, "scaleX", 0f);
         final ObjectAnimator scaleY1 = ObjectAnimator.ofFloat(mMenuButton, "scaleY", 0f);
         final ObjectAnimator alpha1 = ObjectAnimator.ofFloat(mMenuButton, "alpha", 0f);
@@ -370,8 +404,12 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         result.play(set1).before(set2);
         result.addListener(new AnimatorListenerAdapter() {
             @Override
+            public void onAnimationStart(Animator animation) {
+                mIsAnimating = true;
+            }
+            @Override
             public void onAnimationEnd(Animator animation) {
-                mClosedState = true;
+                mIsAnimating = false;
             }
         });
         return result;
