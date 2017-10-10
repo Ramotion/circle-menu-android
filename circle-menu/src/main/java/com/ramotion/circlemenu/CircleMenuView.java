@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.support.annotation.AttrRes;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -22,7 +23,6 @@ import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 
@@ -38,7 +38,6 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     private boolean mClosedState = true;
     private boolean mIsAnimating = false;
 
-    // TODO: add setters
     private int mIconMenu;
     private int mIconClose;
     private int mDurationRing;
@@ -166,12 +165,11 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         addView(mRingView);
     }
 
-    // TODO: move to on sizeChanged
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
 
-        if (mIsAnimating) {
+        if (!changed && mIsAnimating) {
             return;
         }
 
@@ -401,6 +399,57 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             }
         });
         return result;
+    }
+
+    public void setIconMenu(@DrawableRes int iconId) {
+        mIconMenu = iconId;
+    }
+
+    @DrawableRes
+    public int getIconMenu() {
+        return mIconMenu;
+    }
+
+    public void setIconClose(@DrawableRes int iconId) {
+        mIconClose = iconId;
+    }
+
+    @DrawableRes
+    public int getIconClose() {
+        return mIconClose;
+    }
+
+    public void setDurationClose(int duration) {
+        mDurationClose = duration;
+    }
+
+    public int getDurationClose() {
+        return mDurationClose;
+    }
+
+    public void setDurationOpen(int duration) {
+        mDurationOpen = duration;
+    }
+
+    public int getDurationOpen() {
+        return mDurationOpen;
+    }
+
+    public void setDurationRing(int duration) {
+        mDurationRing = duration;
+    }
+
+    public int getDurationRing() {
+        return mDurationRing;
+    }
+
+    public void setDistance(float distance) {
+        mDistance = distance;
+        invalidate();
+    }
+
+    public float getDistance() {
+        return mDistance;
     }
 
 }
