@@ -39,6 +39,14 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     private boolean mClosedState = true;
     private boolean mIsAnimating = false;
 
+    // TODO: add setters
+    private int mIconMenu;
+    private int mIconClose;
+    private int mDurationRing;
+    private int mDurationOpen;
+    private int mDurationClose;
+    private float mDistance;
+
     private final List<View> mButtons = new ArrayList<>();
 
     public CircleMenuView(@NonNull Context context) {
@@ -64,14 +72,70 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     private void init(@NonNull Context context, @Nullable AttributeSet attrs,
                       @Nullable List<Integer> icons, @Nullable List<Integer> colors)
     {
+        // TODO: add setter
+        final int menuButtonColor;
+
+        if (attrs != null) {
+            final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.CircleMenuView, 0, 0);
+            try {
+                if (icons == null && colors == null) {
+                    final int iconArrayId = a.getResourceId(R.styleable.CircleMenuView_button_icons, 0);
+                    final int colorArrayId = a.getResourceId(R.styleable.CircleMenuView_button_colors, 0);
+
+                    final TypedArray iconsIds = getResources().obtainTypedArray(iconArrayId);
+                    final int[] colorsIds = getResources().getIntArray(colorArrayId);
+
+                    final int buttonsCount = Math.min(iconsIds.length(), colorsIds.length);
+
+                    icons = new ArrayList<>(buttonsCount);
+                    colors = new ArrayList<>(buttonsCount);
+
+                    for (int i = 0; i < buttonsCount; i++) {
+                        icons.add(iconsIds.getResourceId(i, -1));
+                        colors.add(colorsIds[i]);
+                    }
+                }
+
+                mIconMenu = a.getResourceId(R.styleable.CircleMenuView_icon_menu, R.drawable.ic_menu_black_24dp);
+                mIconClose = a.getResourceId(R.styleable.CircleMenuView_icon_close, R.drawable.ic_close_black_24dp);
+
+                mDurationRing = a.getInteger(R.styleable.CircleMenuView_duration_ring, getResources().getInteger(android.R.integer.config_mediumAnimTime));
+                mDurationOpen = a.getInteger(R.styleable.CircleMenuView_duration_open, getResources().getInteger(android.R.integer.config_mediumAnimTime));
+                mDurationClose = a.getInteger(R.styleable.CircleMenuView_duration_close, getResources().getInteger(android.R.integer.config_mediumAnimTime));
+
+                mDistance = a.getDimension(R.styleable.CircleMenuView_distance, -1);
+
+                menuButtonColor = a.getColor(R.styleable.CircleMenuView_icon_color, Color.WHITE);
+            } finally {
+                a.recycle();
+            }
+        } else {
+            mIconMenu = R.drawable.ic_menu_black_24dp;
+            mIconClose = R.drawable.ic_close_black_24dp;
+
+            mDurationRing = getResources().getInteger(android.R.integer.config_mediumAnimTime);
+            mDurationOpen = getResources().getInteger(android.R.integer.config_mediumAnimTime);
+            mDurationClose = getResources().getInteger(android.R.integer.config_mediumAnimTime);
+
+            mDistance = -1;
+
+            menuButtonColor = Color.WHITE;
+        }
+
+        if (icons == null || colors == null) {
+            throw new IllegalArgumentException("No buttons icons or colors set");
+        }
+
         LayoutInflater.from(context).inflate(R.layout.circle_menu, this, true);
 
         setClipChildren(false);
         setClipToPadding(false);
 
-        mMenuButton = findViewById(R.id.circle_menu_main_button);
         mRippleView = findViewById(R.id.circle_menu_ripple);
 
+        mMenuButton = findViewById(R.id.circle_menu_main_button);
+        mMenuButton.setImageResource(mIconMenu);
+        mMenuButton.setBackgroundTintList(ColorStateList.valueOf(menuButtonColor));
         mMenuButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,38 +144,10 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
                 }
 
                 final Animator animation = mClosedState ? getOpenMenuAnimation() : getCloseMenuAnimation();
-                animation.setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime));
+                animation.setDuration(mClosedState ? mDurationClose : mDurationOpen);
                 animation.start();
             }
         });
-
-        if (icons == null && colors == null && attrs != null) {
-            final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.CircleMenuView, 0, 0);
-
-            final int iconArrayId = a.getResourceId(R.styleable.CircleMenuView_button_icons, 0);
-            final int colorArrayId = a.getResourceId(R.styleable.CircleMenuView_button_colors, 0);
-
-            final TypedArray iconsIds = getResources().obtainTypedArray(iconArrayId);
-            final int[] colorsIds = getResources().getIntArray(colorArrayId);
-
-            final int buttonsCount = Math.min(iconsIds.length(), colorsIds.length);
-
-            icons = new ArrayList<>(buttonsCount);
-            colors = new ArrayList<>(buttonsCount);
-
-            for (int i = 0; i < buttonsCount; i++) {
-                icons.add(iconsIds.getResourceId(i, -1));
-                colors.add(colorsIds[i]);
-            }
-
-            a.recycle();
-            iconsIds.recycle();
-        }
-
-        if (icons == null || colors == null) {
-            // TODO: write more correctly
-            throw new IllegalArgumentException("No icons for buttons set");
-        }
 
         final int buttonsCount = Math.min(icons.size(), colors.size());
         for (int i = 0; i < buttonsCount; i++) {
@@ -128,17 +164,12 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             mButtons.add(button);
         }
 
-        final float density = context.getResources().getDisplayMetrics().density;
-        final int buttonSize = (int) (density * 56);
-        final int size = (int) (buttonSize + buttonSize * 2f);
-
         mRingView = new RingEffectView(context);
         mRingView.setStrokeColor(Color.RED);
-        mRingView.setStrokeWidth(buttonSize);
-        mRingView.setLayoutParams(new LayoutParams(size, size));
         addView(mRingView);
     }
 
+    // TODO: move to on sizeChanged
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
@@ -155,8 +186,21 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             button.setY(y);
         }
 
+        final Rect buttonRect = new Rect();
+        mMenuButton.getContentRect(buttonRect);
+
         mRingView.setX(getWidth() / 2 - mRingView.getWidth() / 2);
         mRingView.setY(getHeight() / 2 - mRingView.getHeight() / 2);
+        mRingView.setStrokeWidth(buttonRect.width());
+
+        if (mDistance == -1) {
+            mDistance = buttonRect.width() * 1.5f;
+        }
+
+        final LayoutParams lp = (LayoutParams) mRingView.getLayoutParams();
+        lp.width = (int) mDistance * 2;
+        lp.height = (int) mDistance * 2;
+        mRingView.setLayoutParams(lp);
     }
 
     @Override
@@ -170,7 +214,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
         final AnimatorSet set = new AnimatorSet();
         set.playTogether(ripple, click);
-        set.setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime));
+        set.setDuration(mDurationRing);
         set.start();
     }
 
@@ -220,9 +264,8 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         final Rect buttonRect = new Rect();
         mMenuButton.getContentRect(buttonRect);
 
-        final float radius = buttonRect.width() * 1.5f;
-        final float x = (float) Math.cos(Math.toRadians(startAngle)) * radius;
-        final float y = (float) Math.sin(Math.toRadians(startAngle)) * radius;
+        final float x = (float) Math.cos(Math.toRadians(startAngle)) * mDistance;
+        final float y = (float) Math.sin(Math.toRadians(startAngle)) * mDistance;
 
         button.setPivotX(button.getPivotX() - x);
         button.setPivotY(button.getPivotY() - y);
@@ -306,22 +349,18 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 if (valueAnimator.getAnimatedFraction() == 0.5f) {
-                    mMenuButton.setImageResource(R.drawable.ic_close_black_24dp);
+                    mMenuButton.setImageResource(mIconClose);
                 }
             }
         });
 
-        final Rect buttonRect = new Rect();
-        mMenuButton.getContentRect(buttonRect);
-
-        final float radius = buttonRect.width() * 1.5f;
         final float centerX = mMenuButton.getX();
         final float centerY = mMenuButton.getY();
 
         final int buttonsCount = mButtons.size();
         final float angleStep = 360f / buttonsCount;
 
-        final ValueAnimator buttonsAppear = ValueAnimator.ofFloat(0f, radius);
+        final ValueAnimator buttonsAppear = ValueAnimator.ofFloat(0f, mDistance);
         buttonsAppear.setInterpolator(new OvershootInterpolator());
         buttonsAppear.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -388,7 +427,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             @Override
             public void onAnimationEnd(Animator animation) {
                 mMenuButton.setRotation(60f);
-                mMenuButton.setImageResource(R.drawable.ic_menu_black_24dp);
+                mMenuButton.setImageResource(mIconMenu);
             }
         });
 

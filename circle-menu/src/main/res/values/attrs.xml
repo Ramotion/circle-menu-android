@@ -3,5 +3,12 @@
     <declare-styleable name="CircleMenuView">
         <attr name="button_icons" format="reference"/>
         <attr name="button_colors" format="reference"/>
+        <attr name="icon_menu" format="reference"/>
+        <attr name="icon_close" format="reference"/>
+        <attr name="icon_color" format="color"/>
+        <attr name="duration_ring" format="integer"/>
+        <attr name="duration_open" format="integer"/>
+        <attr name="duration_close" format="integer"/>
+        <attr name="distance" format="dimension"/>
     </declare-styleable>
 </resources>
