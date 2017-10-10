@@ -33,7 +33,6 @@ import java.util.List;
 public class CircleMenuView extends FrameLayout implements View.OnClickListener {
 
     private FloatingActionButton mMenuButton;
-    private RippleEffectView mRippleView;
     private RingEffectView mRingView;
 
     private boolean mClosedState = true;
@@ -131,8 +130,6 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         setClipChildren(false);
         setClipToPadding(false);
 
-        mRippleView = findViewById(R.id.circle_menu_ripple);
-
         mMenuButton = findViewById(R.id.circle_menu_main_button);
         mMenuButton.setImageResource(mIconMenu);
         mMenuButton.setBackgroundTintList(ColorStateList.valueOf(menuButtonColor));
@@ -209,51 +206,9 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             return;
         }
 
-        final Animator ripple = getRippleAnimation(view);
         final Animator click = getButtonClickAnimation((FloatingActionButton)view);
-
-        final AnimatorSet set = new AnimatorSet();
-        set.playTogether(ripple, click);
-        set.setDuration(mDurationRing);
-        set.start();
-    }
-
-    private Animator getRippleAnimation(@NonNull View centerView) {
-        final float centreX = centerView.getX() + centerView.getWidth()  / 2;
-        final float centreY = centerView.getY() + centerView.getHeight() / 2;
-
-        mRippleView.setX(centreX - mRippleView.getWidth() / 2);
-        mRippleView.setY(centreY - mRippleView.getHeight() / 2);
-        mRippleView.reset();
-
-        final ObjectAnimator circle = ObjectAnimator.ofFloat(mRippleView, "circleRadius", mRippleView.getWidth() * 0.4f);
-        circle.setInterpolator(new OvershootInterpolator());
-
-        final ObjectAnimator hole = ObjectAnimator.ofFloat(mRippleView, "holeRadius", mRippleView.getWidth() * 0.4f);
-        hole.setInterpolator(new AccelerateDecelerateInterpolator());
-        hole.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                mRippleView.invalidate();
-            }
-        });
-
-        final AnimatorSet result = new AnimatorSet();
-        result.playTogether(circle, hole);
-        result.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                mIsAnimating = true;
-                mRippleView.setVisibility(View.VISIBLE);
-            }
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mIsAnimating = false;
-                mRippleView.setVisibility(View.INVISIBLE);
-            }
-        });
-
-        return result;
+        click.setDuration(mDurationRing);
+        click.start();
     }
 
     private Animator getButtonClickAnimation(final @NonNull FloatingActionButton button) {
@@ -303,19 +258,16 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             public void onAnimationStart(Animator animation) {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     bringChildToFront(mRingView);
-                    bringChildToFront(mRippleView);
                     bringChildToFront(button);
                 } else {
                     button.setCompatElevation(elevation + 2);
                     ViewCompat.setZ(mRingView, elevation + 1);
-                    ViewCompat.setZ(mRippleView, elevation + 3);
                 }
             }
             @Override
             public void onAnimationEnd(Animator animation) {
                 button.setCompatElevation(elevation);
                 ViewCompat.setZ(mRingView, elevation);
-                ViewCompat.setZ(mRippleView, elevation);
             }
         });
 
@@ -365,7 +317,6 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         buttonsAppear.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                ViewCompat.setZ(mRippleView, mMenuButton.getCompatElevation() + 3);
                 for (View view: mButtons) {
                     view.setVisibility(View.VISIBLE);
                 }
@@ -391,10 +342,8 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             }
         });
 
-        final Animator rippleAnimation = getRippleAnimation(mMenuButton);
-
         final AnimatorSet result = new AnimatorSet();
-        result.playTogether(alphaAnimation, rotateAnimation, rippleAnimation, buttonsAppear);
+        result.playTogether(alphaAnimation, rotateAnimation, buttonsAppear);
         result.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {

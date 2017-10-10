@@ -13,9 +13,4 @@
         android:src="@drawable/ic_menu_black_24dp"
         app:backgroundTint="@android:color/white"/>
 
-    <com.ramotion.circlemenu.RippleEffectView
-        android:id="@+id/circle_menu_ripple"
-        android:layout_width="150dp"
-        android:layout_height="150dp"/>
-
 </merge>
