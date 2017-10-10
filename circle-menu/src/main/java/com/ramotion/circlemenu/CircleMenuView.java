@@ -30,14 +30,51 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * CircleMenuView
+ */
 public class CircleMenuView extends FrameLayout implements View.OnClickListener {
 
+    /**
+     * CircleMenu event listener.
+     */
     public static class EventListener {
+        /**
+         * Invoked on menu button click, before animation start.
+         * @param view current CircleMenuView instance.
+         */
         public void onMenuOpenAnimationStart(@NonNull CircleMenuView view) {}
+
+        /**
+         * Invoked on menu button click, after animation end.
+         * @param view - current CircleMenuView instance.
+         */
         public void onMenuOpenAnimationEnd(@NonNull CircleMenuView view) {}
+
+        /**
+         * Invoked on close menu button click, before animation start.
+         * @param view - current CircleMenuView instance.
+         */
         public void onMenuCloseAnimationStart(@NonNull CircleMenuView view) {}
+
+        /**
+         * Invoked on close menu button click, after animation end.
+         * @param view - current CircleMenuView instance.
+         */
         public void onMenuCloseAnimationEnd(@NonNull CircleMenuView view) {}
+
+        /**
+         * Invoked on button click, before animation start.
+         * @param view - current CircleMenuView instance.
+         * @param buttonIndex - clicked button zero-based index.
+         */
         public void onButtonClickAnimationStart(@NonNull CircleMenuView view, int buttonIndex) {}
+
+        /**
+         * Invoked on button click, after animation end.
+         * @param view - current CircleMenuView instance.
+         * @param buttonIndex - clicked button zero-based index.
+         */
         public void onButtonClickAnimationEnd(@NonNull CircleMenuView view, int buttonIndex) {}
     }
 
@@ -58,11 +95,6 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
     private final List<View> mButtons = new ArrayList<>();
 
-    public CircleMenuView(@NonNull Context context) {
-        super(context);
-        init(context, null, null, null);
-    }
-
     public CircleMenuView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs, null, null);
@@ -73,6 +105,12 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         init(context, attrs, null, null);
     }
 
+    /**
+     * Constructor for creation CircleMenuView in code, not in xml-layout.
+     * @param context current context, will be used to access resources.
+     * @param icons buttons icons resource ids array. Items must be @DrawableRes.
+     * @param colors buttons colors resource ids array. Items must be @DrawableRes.
+     */
     public CircleMenuView(@NonNull Context context, @NonNull List<Integer> icons, @NonNull List<Integer> colors) {
         super(context);
         init(context, null, icons, colors);
@@ -468,43 +506,83 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         return mIconClose;
     }
 
+    /**
+     * See {@link R.styleable#CircleMenuView_duration_close}
+     * @param duration close animation duration in milliseconds.
+     */
     public void setDurationClose(int duration) {
         mDurationClose = duration;
     }
 
+    /**
+     * See {@link R.styleable#CircleMenuView_duration_close}
+     * @return current close animation duration.
+     */
     public int getDurationClose() {
         return mDurationClose;
     }
 
+    /**
+     * See {@link R.styleable#CircleMenuView_duration_open}
+     * @param duration open animation duration in milliseconds.
+     */
     public void setDurationOpen(int duration) {
         mDurationOpen = duration;
     }
 
+    /**
+     * See {@link R.styleable#CircleMenuView_duration_open}
+     * @return current open animation duration.
+     */
     public int getDurationOpen() {
         return mDurationOpen;
     }
 
+    /**
+     * See {@link R.styleable#CircleMenuView_duration_ring}
+     * @param duration ring animation duration in milliseconds.
+     */
     public void setDurationRing(int duration) {
         mDurationRing = duration;
     }
 
+    /**
+     * See {@link R.styleable#CircleMenuView_duration_ring}
+     * @return current ring animation duration.
+     */
     public int getDurationRing() {
         return mDurationRing;
     }
 
+    /**
+     * See {@link R.styleable#CircleMenuView_distance}
+     * @param distance in pixels.
+     */
     public void setDistance(float distance) {
         mDistance = distance;
         invalidate();
     }
 
+    /**
+     * See {@link R.styleable#CircleMenuView_distance}
+     * @return current distance in pixels.
+     */
     public float getDistance() {
         return mDistance;
     }
 
-    public void setEventListener(EventListener listener) {
+    /**
+     * See {@link CircleMenuView.EventListener }
+     * @param listener new event listener or null.
+     */
+    public void setEventListener(@Nullable EventListener listener) {
         mListener = listener;
     }
 
+    /**
+     * See {@link CircleMenuView.EventListener }
+     * @return current event listener or null.
+     */
     public EventListener getEventListener() {
         return mListener;
     }
