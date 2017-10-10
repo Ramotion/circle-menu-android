@@ -32,6 +32,17 @@ import java.util.List;
 
 public class CircleMenuView extends FrameLayout implements View.OnClickListener {
 
+    public static class EventListener {
+        public void onMenuOpenAnimationStart(@NonNull CircleMenuView view) {}
+        public void onMenuOpenAnimationEnd(@NonNull CircleMenuView view) {}
+        public void onMenuCloseAnimationStart(@NonNull CircleMenuView view) {}
+        public void onMenuCloseAnimationEnd(@NonNull CircleMenuView view) {}
+        public void onButtonClickAnimationStart(@NonNull CircleMenuView view, int buttonIndex) {}
+        public void onButtonClickAnimationEnd(@NonNull CircleMenuView view, int buttonIndex) {}
+    }
+
+    private EventListener mListener;
+
     private FloatingActionButton mMenuButton;
     private RingEffectView mRingView;
 
@@ -141,6 +152,30 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
                 final Animator animation = mClosedState ? getOpenMenuAnimation() : getCloseMenuAnimation();
                 animation.setDuration(mClosedState ? mDurationClose : mDurationOpen);
+                animation.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        if (mListener != null) {
+                            if (mClosedState) {
+                                mListener.onMenuOpenAnimationStart(CircleMenuView.this);
+                            } else {
+                                mListener.onMenuCloseAnimationStart(CircleMenuView.this);
+                            }
+                        }
+                    }
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        animation.removeListener(this);
+                        if (mListener != null) {
+                            if (mClosedState) {
+                                mListener.onMenuOpenAnimationEnd(CircleMenuView.this);
+                            } else {
+                                mListener.onMenuCloseAnimationEnd(CircleMenuView.this);
+                            }
+                        }
+                    }
+                });
+
                 animation.start();
             }
         });
@@ -199,13 +234,27 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     }
 
     @Override
-    public void onClick(View view) {
+    public void onClick(final View view) {
         if (mIsAnimating) {
             return;
         }
 
         final Animator click = getButtonClickAnimation((FloatingActionButton)view);
         click.setDuration(mDurationRing);
+        click.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                if (mListener != null) {
+                    mListener.onButtonClickAnimationStart(CircleMenuView.this, mButtons.indexOf(view));
+                }
+            }
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (mListener != null) {
+                    mListener.onButtonClickAnimationEnd(CircleMenuView.this, mButtons.indexOf(view));
+                }
+            }
+        });
         click.start();
     }
 
@@ -450,6 +499,14 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
     public float getDistance() {
         return mDistance;
+    }
+
+    public void setEventListener(EventListener listener) {
+        mListener = listener;
+    }
+
+    public EventListener getEventListener() {
+        return mListener;
     }
 
 }
