@@ -257,8 +257,8 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         final Rect buttonRect = new Rect();
         mMenuButton.getContentRect(buttonRect);
 
-        mRingView.setX(getWidth() / 2 - mRingView.getWidth() / 2);
-        mRingView.setY(getHeight() / 2 - mRingView.getHeight() / 2);
+        mRingView.setX(getWidth() / 2f - mRingView.getWidth() / 2f);
+        mRingView.setY(getHeight() / 2f - mRingView.getHeight() / 2f);
         mRingView.setStrokeWidth(buttonRect.width());
 
         if (mDistance == -1) {
@@ -266,8 +266,8 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         }
 
         final LayoutParams lp = (LayoutParams) mRingView.getLayoutParams();
-        lp.width = (int) mDistance * 2;
-        lp.height = (int) mDistance * 2;
+        lp.width = (int) (mDistance * 2);
+        lp.height = (int) (mDistance * 2);
         mRingView.setLayoutParams(lp);
     }
 
@@ -298,24 +298,23 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
     private Animator getButtonClickAnimation(final @NonNull FloatingActionButton button) {
         final int buttonNumber = mButtons.indexOf(button) + 1;
-        final int stepAngle = 360 / mButtons.size();
-        final int startAngle = -90 - stepAngle + stepAngle * buttonNumber;
-
-        final Rect buttonRect = new Rect();
-        mMenuButton.getContentRect(buttonRect);
+        final float stepAngle = 360f / mButtons.size();
+        final float startAngle = -90 - stepAngle + stepAngle * buttonNumber;
 
         final float x = (float) Math.cos(Math.toRadians(startAngle)) * mDistance;
         final float y = (float) Math.sin(Math.toRadians(startAngle)) * mDistance;
 
-        button.setPivotX(button.getPivotX() - x);
-        button.setPivotY(button.getPivotY() - y);
+        final float pivotX = button.getPivotX();
+        final float pivotY = button.getPivotY();
+        button.setPivotX(pivotX - x);
+        button.setPivotY(pivotY - y);
 
         final ObjectAnimator rotateButton = ObjectAnimator.ofFloat(button, "rotation", 0f, 360f);
         rotateButton.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                button.setPivotX(buttonRect.width() / 2);
-                button.setPivotY(buttonRect.height() / 2);
+                button.setPivotX(pivotX);
+                button.setPivotY(pivotY);
             }
         });
 
