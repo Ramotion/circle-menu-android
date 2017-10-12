@@ -94,6 +94,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     private float mDistance;
 
     private final List<View> mButtons = new ArrayList<>();
+    private final Rect mButtonRect = new Rect();
 
     public CircleMenuView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -130,16 +131,20 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
                     final int colorArrayId = a.getResourceId(R.styleable.CircleMenuView_button_colors, 0);
 
                     final TypedArray iconsIds = getResources().obtainTypedArray(iconArrayId);
-                    final int[] colorsIds = getResources().getIntArray(colorArrayId);
+                    try {
+                        final int[] colorsIds = getResources().getIntArray(colorArrayId);
 
-                    final int buttonsCount = Math.min(iconsIds.length(), colorsIds.length);
+                        final int buttonsCount = Math.min(iconsIds.length(), colorsIds.length);
 
-                    icons = new ArrayList<>(buttonsCount);
-                    colors = new ArrayList<>(buttonsCount);
+                        icons = new ArrayList<>(buttonsCount);
+                        colors = new ArrayList<>(buttonsCount);
 
-                    for (int i = 0; i < buttonsCount; i++) {
-                        icons.add(iconsIds.getResourceId(i, -1));
-                        colors.add(colorsIds[i]);
+                        for (int i = 0; i < buttonsCount; i++) {
+                            icons.add(iconsIds.getResourceId(i, -1));
+                            colors.add(colorsIds[i]);
+                        }
+                    } finally {
+                        iconsIds.recycle();
                     }
                 }
 
@@ -254,15 +259,14 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             button.setY(y);
         }
 
-        final Rect buttonRect = new Rect();
-        mMenuButton.getContentRect(buttonRect);
+        mMenuButton.getContentRect(mButtonRect);
 
         mRingView.setX(getWidth() / 2f - mRingView.getWidth() / 2f);
         mRingView.setY(getHeight() / 2f - mRingView.getHeight() / 2f);
-        mRingView.setStrokeWidth(buttonRect.width());
+        mRingView.setStrokeWidth(mButtonRect.width());
 
         if (mDistance == -1) {
-            mDistance = buttonRect.width() * 1.5f;
+            mDistance = mButtonRect.width() * 1.5f;
         }
 
         final LayoutParams lp = (LayoutParams) mRingView.getLayoutParams();
@@ -320,14 +324,12 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
         final float elevation = mMenuButton.getCompatElevation();
 
+        mRingView.setVisibility(View.INVISIBLE);
         mRingView.setStartAngle(startAngle);
         mRingView.setAngle(0);
-        mRingView.setAlpha(1f);
-        mRingView.setScaleX(1f);
-        mRingView.setScaleY(1f);
         mRingView.setStrokeColor(button.getBackgroundTintList().getDefaultColor());
 
-        final ObjectAnimator angle = ObjectAnimator.ofFloat(mRingView, "angle", 360);
+        final ObjectAnimator ring = ObjectAnimator.ofFloat(mRingView, "angle", 360);
         final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mRingView, "scaleX", 1f, 1.3f);
         final ObjectAnimator scaleY = ObjectAnimator.ofFloat(mRingView, "scaleY", 1f, 1.3f);
         final ObjectAnimator visible = ObjectAnimator.ofFloat(mRingView, "alpha", 1f, 0f);
@@ -336,7 +338,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         lastSet.playTogether(scaleX, scaleY, visible, getCloseMenuAnimation());
 
         final AnimatorSet firstSet = new AnimatorSet();
-        firstSet.playTogether(rotateButton, angle);
+        firstSet.playTogether(rotateButton, ring);
         firstSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -347,6 +349,9 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
                     button.setCompatElevation(elevation + 2);
                     ViewCompat.setZ(mRingView, elevation + 1);
                 }
+                mRingView.setScaleX(1f);
+                mRingView.setScaleY(1f);
+                mRingView.setVisibility(View.VISIBLE);
             }
             @Override
             public void onAnimationEnd(Animator animation) {

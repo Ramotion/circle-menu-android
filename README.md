@@ -80,7 +80,9 @@ Example of arrays `colors` and `icons` in `res\values\buttons.xml`:
 ```
 
 Or use the constructor
-`CircleMenuView(@NonNull Context context, @NonNull List<Integer> icons, @NonNull List<Integer> colors)`,
+```java
+CircleMenuView(@NonNull Context context, @NonNull List<Integer> icons, @NonNull List<Integer> colors)
+```
 to add `CircleMenuView` and configure the buttons programmatically (in the code).
 
 Next, connect the event handler `CircleMenuView.EventListener` as shown below,
@@ -122,15 +124,15 @@ menu.setEventListener(new CircleMenuView.EventListener() {
 ```
 
 Here are the attributes you can specify through XML or related setters:
-*`button_icons` - Array of buttons icons.
-*`button_colors` - Array of buttons colors.
-*`icon_menu` - Menu default icon.
-*`icon_close` - Menu closed icon.
-*`icon_color` - Menu icon color.
-*`duration_ring` - Ring effect duration.
-*`duration_open` - Menu opening animation duration.
-*`duration_close` - Menu closing animation duration.
-*`distance` - Distance between center button and buttons
+* `button_icons` - Array of buttons icons.
+* `button_colors` - Array of buttons colors.
+* `icon_menu` - Menu default icon.
+* `icon_close` - Menu closed icon.
+* `icon_color` - Menu icon color.
+* `duration_ring` - Ring effect duration.
+* `duration_open` - Menu opening animation duration.
+* `duration_close` - Menu closing animation duration.
+* `distance` - Distance between center button and buttons
 
 ## License
 ​
