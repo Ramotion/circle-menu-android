@@ -5,6 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.annotation.FloatRange;
+import android.support.annotation.Nullable;
+import android.util.AttributeSet;
 import android.view.View;
 
 
@@ -16,9 +18,14 @@ public class RingEffectView extends View {
 
     private float mAngle;
     private float mStartAngle;
+    private int mRadius;
 
     public RingEffectView(Context context) {
-        super(context);
+        this(context, null);
+    }
+
+    public RingEffectView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
 
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setStyle(Paint.Style.STROKE);
@@ -26,15 +33,11 @@ public class RingEffectView extends View {
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        mRingRect = new RectF(0, 0, w, h);
-    }
-
-    @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawArc(mRingRect, mStartAngle, mAngle, false, mPaint);
+        if (mRingRect != null) {
+            canvas.drawArc(mRingRect, mStartAngle, mAngle, false, mPaint);
+        }
     }
 
     @Override
@@ -71,6 +74,23 @@ public class RingEffectView extends View {
 
     public void setStrokeWidth(int width) {
         mPaint.setStrokeWidth(width);
+    }
+
+    public void setRadius(int radius) {
+        mRadius = radius;
+        final int w = getMeasuredWidth();
+        final int h = getMeasuredHeight();
+
+        final int wo = (w - radius * 2) / 2;
+        final int ho = (h - radius * 2) / 2;
+
+        final float sw = mPaint.getStrokeWidth() * 0.5f;
+
+        mRingRect = new RectF(wo + sw, ho + sw, w - wo - sw, h - ho - sw);
+    }
+
+    public int getRadius() {
+        return mRadius;
     }
 
 }

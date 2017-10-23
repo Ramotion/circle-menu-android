@@ -35,6 +35,10 @@ import java.util.List;
  */
 public class CircleMenuView extends FrameLayout implements View.OnClickListener {
 
+    private static int DEFAULT_BUTTON_SIZE = 56;
+    private static float DEFAULT_DISTANCE = DEFAULT_BUTTON_SIZE * 1.5f;
+    private static float DEFAULT_RING_SCALE_RATIO = 1.3f;
+
     /**
      * CircleMenu event listener.
      */
@@ -91,6 +95,9 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     private int mDurationRing;
     private int mDurationOpen;
     private int mDurationClose;
+    private int mDesiredSize;
+    private int mRingRadius;
+
     private float mDistance;
 
     private final List<View> mButtons = new ArrayList<>();
@@ -122,6 +129,9 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     {
         // TODO: add setter
         final int menuButtonColor;
+
+        final float density = context.getResources().getDisplayMetrics().density;
+        final float defaultDistance = DEFAULT_DISTANCE * density;
 
         if (attrs != null) {
             final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.CircleMenuView, 0, 0);
@@ -155,7 +165,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
                 mDurationOpen = a.getInteger(R.styleable.CircleMenuView_duration_open, getResources().getInteger(android.R.integer.config_mediumAnimTime));
                 mDurationClose = a.getInteger(R.styleable.CircleMenuView_duration_close, getResources().getInteger(android.R.integer.config_mediumAnimTime));
 
-                mDistance = a.getDimension(R.styleable.CircleMenuView_distance, -1);
+                mDistance = a.getDimension(R.styleable.CircleMenuView_distance, defaultDistance);
 
                 menuButtonColor = a.getColor(R.styleable.CircleMenuView_icon_color, Color.WHITE);
             } finally {
@@ -169,10 +179,14 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             mDurationOpen = getResources().getInteger(android.R.integer.config_mediumAnimTime);
             mDurationClose = getResources().getInteger(android.R.integer.config_mediumAnimTime);
 
-            mDistance = -1;
+            mDistance = defaultDistance;
 
             menuButtonColor = Color.WHITE;
         }
+
+        final float buttonSize = DEFAULT_BUTTON_SIZE * density;
+        mRingRadius = (int) (buttonSize + (mDistance - buttonSize / 2));
+        mDesiredSize = (int) (mRingRadius * 2 * DEFAULT_RING_SCALE_RATIO);
 
         if (icons == null || colors == null) {
             throw new IllegalArgumentException("No buttons icons or colors set");
@@ -238,9 +252,17 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             mButtons.add(button);
         }
 
-        mRingView = new RingEffectView(context);
-        mRingView.setStrokeColor(Color.RED);
-        addView(mRingView);
+        mRingView = findViewById(R.id.ring_view);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        final int w = resolveSizeAndState(mDesiredSize, widthMeasureSpec, 0);
+        final int h = resolveSizeAndState(mDesiredSize, heightMeasureSpec, 0);
+
+        setMeasuredDimension(w, h);
     }
 
     @Override
@@ -261,18 +283,8 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
         mMenuButton.getContentRect(mButtonRect);
 
-        mRingView.setX(getWidth() / 2f - mRingView.getWidth() / 2f);
-        mRingView.setY(getHeight() / 2f - mRingView.getHeight() / 2f);
         mRingView.setStrokeWidth(mButtonRect.width());
-
-        if (mDistance == -1) {
-            mDistance = mButtonRect.width() * 1.5f;
-        }
-
-        final LayoutParams lp = (LayoutParams) mRingView.getLayoutParams();
-        lp.width = (int) (mDistance * 2);
-        lp.height = (int) (mDistance * 2);
-        mRingView.setLayoutParams(lp);
+        mRingView.setRadius(mRingRadius);
     }
 
     @Override
@@ -330,8 +342,8 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         mRingView.setStrokeColor(button.getBackgroundTintList().getDefaultColor());
 
         final ObjectAnimator ring = ObjectAnimator.ofFloat(mRingView, "angle", 360);
-        final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mRingView, "scaleX", 1f, 1.3f);
-        final ObjectAnimator scaleY = ObjectAnimator.ofFloat(mRingView, "scaleY", 1f, 1.3f);
+        final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mRingView, "scaleX", 1f, DEFAULT_RING_SCALE_RATIO);
+        final ObjectAnimator scaleY = ObjectAnimator.ofFloat(mRingView, "scaleY", 1f, DEFAULT_RING_SCALE_RATIO);
         final ObjectAnimator visible = ObjectAnimator.ofFloat(mRingView, "alpha", 1f, 0f);
 
         final AnimatorSet lastSet = new AnimatorSet();
