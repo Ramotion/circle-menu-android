@@ -35,9 +35,9 @@ import java.util.List;
  */
 public class CircleMenuView extends FrameLayout implements View.OnClickListener {
 
-    private static int DEFAULT_BUTTON_SIZE = 56;
-    private static float DEFAULT_DISTANCE = DEFAULT_BUTTON_SIZE * 1.5f;
-    private static float DEFAULT_RING_SCALE_RATIO = 1.3f;
+    private static final int DEFAULT_BUTTON_SIZE = 56;
+    private static final float DEFAULT_DISTANCE = DEFAULT_BUTTON_SIZE * 1.5f;
+    private static final float DEFAULT_RING_SCALE_RATIO = 1.3f;
 
     /**
      * CircleMenu event listener.
@@ -127,7 +127,6 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     private void init(@NonNull Context context, @Nullable AttributeSet attrs,
                       @Nullable List<Integer> icons, @Nullable List<Integer> colors)
     {
-        // TODO: add setter
         final int menuButtonColor;
 
         final float density = context.getResources().getDisplayMetrics().density;
@@ -339,7 +338,11 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         mRingView.setVisibility(View.INVISIBLE);
         mRingView.setStartAngle(startAngle);
         mRingView.setAngle(0);
-        mRingView.setStrokeColor(button.getBackgroundTintList().getDefaultColor());
+
+        final ColorStateList csl = button.getBackgroundTintList();
+        if (csl != null) {
+            mRingView.setStrokeColor(csl.getDefaultColor());
+        }
 
         final ObjectAnimator ring = ObjectAnimator.ofFloat(mRingView, "angle", 360);
         final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mRingView, "scaleX", 1f, DEFAULT_RING_SCALE_RATIO);
