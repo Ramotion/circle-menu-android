@@ -402,9 +402,12 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         final PropertyValuesHolder pvhRotation = PropertyValuesHolder.ofKeyframe("rotation", kf0, kf1, kf2);
         final ObjectAnimator rotateAnimation = ObjectAnimator.ofPropertyValuesHolder(mMenuButton, pvhRotation);
         rotateAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            private boolean iconChanged = false;
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                if (valueAnimator.getAnimatedFraction() == 0.5f) {
+                final float fraction = valueAnimator.getAnimatedFraction();
+                if (fraction >= 0.5f && !iconChanged) {
+                    iconChanged = true;
                     mMenuButton.setImageResource(mIconClose);
                 }
             }
