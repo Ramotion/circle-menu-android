@@ -1,24 +1,20 @@
-<!-- TODO: fix url -->
-[![header](./header.png)](https://ramotion.com?utm_source=gthb&utm_medium=special&utm_campaign=cardslider-android-logo)
+[![header](./header.png)](https://ramotion.com?utm_source=gthb&utm_medium=special&utm_campaign=circle-menu-android-logo)
 
 # CircleMenu for Android
 [![Twitter](https://img.shields.io/badge/Twitter-@Ramotion-blue.svg?style=flat)](http://twitter.com/Ramotion)
 
-<!-- TODO: fix urls -->
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/42eb7b00b93645c0812c045ab26cb3b7)](https://www.codacy.com/app/andreylos/cardslider-android?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Ramotion/cardslider-android&amp;utm_campaign=Badge_Grade)
-[![CircleCI](https://circleci.com/gh/Ramotion/cardslider-android/tree/master.svg?style=svg)](https://circleci.com/gh/Ramotion/cardslider-android/tree/master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/42eb7b00b93645c0812c045ab26cb3b7)](https://www.codacy.com/app/dvg4000/circle-menu-android?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Ramotion/circle-menu-android&amp;utm_campaign=Badge_Grade)
+[![CircleCI](https://circleci.com/gh/Ramotion/circle-menu-android/tree/master.svg?style=svg)](https://circleci.com/gh/Ramotion/circle-menu-android/tree/master)
 
 ## About
 This project is maintained by Ramotion, Inc.<br>
 We specialize in the designing and coding of custom UI for Mobile Apps and Websites.<br><br>**Looking for developers for your project?** 
 
-<!-- TODO: fix url -->
-<a href="https://ramotion.com?utm_source=gthb&utm_medium=special&utm_campaign=cardslider-android-contact-us/#Get_in_Touch" > <img src="https://github.com/Ramotion/navigation-stack/raw/master/contact_our_team@2x.png" width="150" height="30"></a>
+<a href="https://ramotion.com?utm_source=gthb&utm_medium=special&utm_campaign=circle-menu-android-contact-us/#Get_in_Touch" > <img src="https://github.com/Ramotion/navigation-stack/raw/master/contact_our_team@2x.png" width="150" height="30"></a>
 
 ![Animation](./preview.gif)
 
-<!-- TODO: fix url -->
-The [Android mockup](https://store.ramotion.com?utm_source=gthb&utm_medium=special&utm_campaign=cardslider-android) available [here](https://store.ramotion.com/product/htc-one-a9-mockups?utm_source=gthb&utm_medium=special&utm_campaign=cardslider-android).
+The [Android mockup](https://store.ramotion.com?utm_source=gthb&utm_medium=special&utm_campaign=circle-menu-android) available [here](https://store.ramotion.com/product/htc-one-a9-mockups?utm_source=gthb&utm_medium=special&utm_campaign=circle-menu-android).
 
 ## Requirements
 ​
