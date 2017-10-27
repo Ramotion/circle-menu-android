@@ -359,26 +359,6 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
         final AnimatorSet firstSet = new AnimatorSet();
         firstSet.playTogether(rotateButton, ring);
-        firstSet.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    bringChildToFront(mRingView);
-                    bringChildToFront(button);
-                } else {
-                    button.setCompatElevation(elevation + 2);
-                    ViewCompat.setZ(mRingView, elevation + 1);
-                }
-                mRingView.setScaleX(1f);
-                mRingView.setScaleY(1f);
-                mRingView.setVisibility(View.VISIBLE);
-            }
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                button.setCompatElevation(elevation);
-                ViewCompat.setZ(mRingView, elevation);
-            }
-        });
 
         final AnimatorSet result = new AnimatorSet();
         result.play(firstSet).before(lastSet);
@@ -386,10 +366,36 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             @Override
             public void onAnimationStart(Animator animation) {
                 mIsAnimating = true;
+
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    bringChildToFront(mRingView);
+                    bringChildToFront(button);
+                } else {
+                    button.setCompatElevation(elevation + 1);
+                    ViewCompat.setZ(mRingView, elevation + 1);
+
+                    for (View b : mButtons) {
+                        if (b != button) {
+                            ((FloatingActionButton) b).setCompatElevation(0);
+                        }
+                    }
+                }
+
+                mRingView.setScaleX(1f);
+                mRingView.setScaleY(1f);
+                mRingView.setVisibility(View.VISIBLE);
             }
             @Override
             public void onAnimationEnd(Animator animation) {
                 mIsAnimating = false;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    for (View b : mButtons) {
+                        ((FloatingActionButton) b).setCompatElevation(elevation);
+                    }
+
+                    ViewCompat.setZ(mRingView, elevation);
+                }
             }
         });
 
