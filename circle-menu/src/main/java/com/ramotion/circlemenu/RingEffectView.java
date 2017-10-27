@@ -3,7 +3,7 @@ package com.ramotion.circlemenu;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.RectF;
+import android.graphics.Path;
 import android.support.annotation.FloatRange;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -12,9 +12,10 @@ import android.view.View;
 
 public class RingEffectView extends View {
 
-    private final Paint mPaint;
+    private static final int STEP_DEGREE = 5;
 
-    private RectF mRingRect;
+    private final Paint mPaint;
+    private final Path mPath = new Path();
 
     private float mAngle;
     private float mStartAngle;
@@ -35,8 +36,12 @@ public class RingEffectView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (mRingRect != null) {
-            canvas.drawArc(mRingRect, mStartAngle, mAngle, false, mPaint);
+
+        if (!mPath.isEmpty()) {
+            canvas.save();
+            canvas.translate(getWidth() / 2, getHeight() / 2);
+            canvas.drawPath(mPath, mPaint);
+            canvas.restore();
         }
     }
 
@@ -56,7 +61,27 @@ public class RingEffectView extends View {
     }
 
     public void setAngle(@FloatRange(from = 0.0, to = 360.0) float angle) {
+        final float diff = angle - mAngle;
+        final int stepCount = (int) (diff / STEP_DEGREE);
+        final float stepMod = diff % STEP_DEGREE;
+
+        final float sw = mPaint.getStrokeWidth() * 0.5f;
+        final float radius = mRadius - sw;
+
+        for (int i = 1; i <= stepCount; i++ ) {
+            final float stepAngel = mStartAngle + mAngle + STEP_DEGREE * i;
+            final float x = (float) Math.cos(Math.toRadians(stepAngel)) * radius;
+            final float y = (float) Math.sin(Math.toRadians(stepAngel)) * radius;
+            mPath.lineTo(x, y);
+        }
+
+        final float stepAngel = mStartAngle + mAngle + STEP_DEGREE * stepCount + stepMod;
+        final float x = (float) Math.cos(Math.toRadians(stepAngel)) * radius;
+        final float y = (float) Math.sin(Math.toRadians(stepAngel)) * radius;
+        mPath.lineTo(x, y);
+
         mAngle = angle;
+
         invalidate();
     }
 
@@ -66,6 +91,15 @@ public class RingEffectView extends View {
 
     public void setStartAngle(@FloatRange(from = 0.0, to = 360.0) float startAngle) {
         mStartAngle = startAngle;
+        mAngle = 0;
+
+        final float sw = mPaint.getStrokeWidth() * 0.5f;
+        final float radius = mRadius - sw;
+
+        mPath.reset();
+        final float x = (float) Math.cos(Math.toRadians(startAngle)) * radius;
+        final float y = (float) Math.sin(Math.toRadians(startAngle)) * radius;
+        mPath.moveTo(x, y);
     }
 
     public void setStrokeColor(int color) {
@@ -78,15 +112,6 @@ public class RingEffectView extends View {
 
     public void setRadius(int radius) {
         mRadius = radius;
-        final int w = getMeasuredWidth();
-        final int h = getMeasuredHeight();
-
-        final int wo = (w - radius * 2) / 2;
-        final int ho = (h - radius * 2) / 2;
-
-        final float sw = mPaint.getStrokeWidth() * 0.5f;
-
-        mRingRect = new RectF(wo + sw, ho + sw, w - wo - sw, h - ho - sw);
     }
 
     public int getRadius() {

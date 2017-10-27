@@ -284,6 +284,11 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
         mRingView.setStrokeWidth(mButtonRect.width());
         mRingView.setRadius(mRingRadius);
+
+        final LayoutParams lp = (LayoutParams) mRingView.getLayoutParams();//new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        lp.width = right - left;
+        lp.height = bottom - top;
+        mRingView.setLayoutParams(lp);
     }
 
     @Override
@@ -314,10 +319,11 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     private Animator getButtonClickAnimation(final @NonNull FloatingActionButton button) {
         final int buttonNumber = mButtons.indexOf(button) + 1;
         final float stepAngle = 360f / mButtons.size();
-        final float startAngle = -90 - stepAngle + stepAngle * buttonNumber;
+        final float rOStartAngle = (270 - stepAngle + stepAngle * buttonNumber);
+        final float rStartAngle = rOStartAngle > 360 ? rOStartAngle % 360 : rOStartAngle;
 
-        final float x = (float) Math.cos(Math.toRadians(startAngle)) * mDistance;
-        final float y = (float) Math.sin(Math.toRadians(startAngle)) * mDistance;
+        final float x = (float) Math.cos(Math.toRadians(rStartAngle)) * mDistance;
+        final float y = (float) Math.sin(Math.toRadians(rStartAngle)) * mDistance;
 
         final float pivotX = button.getPivotX();
         final float pivotY = button.getPivotY();
@@ -336,8 +342,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         final float elevation = mMenuButton.getCompatElevation();
 
         mRingView.setVisibility(View.INVISIBLE);
-        mRingView.setStartAngle(startAngle);
-        mRingView.setAngle(0);
+        mRingView.setStartAngle(rStartAngle);
 
         final ColorStateList csl = button.getBackgroundTintList();
         if (csl != null) {
