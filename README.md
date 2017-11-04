@@ -14,7 +14,7 @@ We specialize in the designing and coding of custom UI for Mobile Apps and Websi
 <a href="https://ramotion.com?utm_source=gthb&utm_medium=special&utm_campaign=circle-menu-android-contact-us/#Get_in_Touch" > <img src="https://github.com/Ramotion/navigation-stack/raw/master/contact_our_team@2x.png" width="150" height="30"></a>
 
 
-The [Android mockup](https://store.ramotion.com?utm_source=gthb&utm_medium=special&utm_campaign=circle-menu-android) available [here](https://store.ramotion.com/product/htc-one-a9-mockups?utm_source=gthb&utm_medium=special&utm_campaign=circle-menu-android).
+The [Android mockup](https://store.ramotion.com/product/samsung-galaxy-s8-mockups?utm_source=gthb&utm_medium=special&utm_campaign=circle-menu-android) available [here](https://store.ramotion.com/product/samsung-galaxy-s8-mockups?utm_source=gthb&utm_medium=special&utm_campaign=circle-menu-android).
 
 ## Requirements
 ​
