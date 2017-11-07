@@ -1,4 +1,9 @@
 apply plugin: 'com.android.library'
+apply plugin: 'signing'
+apply plugin: 'com.bmuschko.nexus'
+
+group = 'com.ramotion.circlemenu'
+version = '0.1.0'
 
 android {
     compileSdkVersion 26
@@ -8,7 +13,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
-        versionName "1.0"
+        versionName version
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -26,7 +31,44 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:26.+'
-    compile 'com.android.support:design:26.+'
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:design:26.1.0'
     testCompile 'junit:junit:4.12'
+}
+
+modifyPom {
+    project {
+        name 'Circle Menu for Android'
+        description 'CircleMenu is a simple, elegant UI menu with a circular layout and material design animations. http://ramotion.com'
+        url 'https://github.com/Ramotion/circle-menu-android'
+        inceptionYear '2017'
+
+        scm {
+            url 'https://github.com/Ramotion/circle-menu-android'
+            connection 'scm:git@github.com:Ramotion/circle-menu-android.git'
+            developerConnection 'scm:git@github.com:Ramotion/circle-menu-android.git'
+        }
+
+        licenses {
+            license {
+                name 'The MIT License (MIT)'
+                url 'https://opensource.org/licenses/mit-license.php'
+                distribution 'repo'
+            }
+        }
+
+        developers {
+            developer {
+                id 'dvg4000'
+                name 'Dmitry Grishechkin'
+                email 'dvgrishechkin@yandex.ru'
+            }
+        }
+    }
+}
+
+nexus {
+    sign = true
+    repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+    snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
 }
