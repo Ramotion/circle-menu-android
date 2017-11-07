@@ -29,18 +29,18 @@ Just download the package from [here]() and add it to your project classpath, or
 <!-- TODO: add package -->
 Gradle:
 ```groovy
-'com.ramotion.?'
+compile 'com.ramotion.circlemenu:circle-menu:0.1.0'
 ```
 SBT:
 ```scala
-libraryDependencies += "?"
+libraryDependencies += "com.ramotion.circlemenu" % "circle-menu" % "0.1.0"
 ```
 Maven:
 ```xml
 <dependency>
-	<groupId>com.ramotion.?</groupId>
-	<artifactId>?</artifactId>
-	<version>?</version>
+	<groupId>com.ramotion.circlemenu</groupId>
+	<artifactId>circle-menu</artifactId>
+	<version>0.1.0</version>
 </dependency>
 ```
 ​
