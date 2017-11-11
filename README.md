@@ -137,7 +137,7 @@ Here are the attributes you can specify through XML or related setters:
 CircleMenu for Android is released under the MIT license.
 See [LICENSE](./LICENSE.md) for details.
 
-# Get the Showroom App for mobile to give it a try
+# Get the Showroom App for Android to give it a try
 Try our UI components in our mobile app. Contact us if interested.
 
 <a href="https://play.google.com/store/apps/details?id=com.ramotion.showroom" >
