@@ -137,6 +137,15 @@ Here are the attributes you can specify through XML or related setters:
 CircleMenu for Android is released under the MIT license.
 See [LICENSE](./LICENSE.md) for details.
 
+# Get the Showroom App for mobile to give it a try
+Try our UI components in our mobile app. Contact us if interested.
+
+<a href="https://play.google.com/store/apps/details?id=com.ramotion.showroom" >
+<img src="https://raw.githubusercontent.com/Ramotion/react-native-circle-menu/master/google_play@2x.png" width="104" height="34"></a>
+<a href="https://ramotion.com/?utm_source=gthb&utm_medium=special&utm_campaign=circle-menu-android-contact-us/#Get_in_Touch"> 
+<img src="https://github.com/ramotion/gliding-collection/raw/master/contact_our_team@2x.png" width="187" height="34"></a>
+<br>
+<br>
 ## Follow us
 
 [![Twitter URL](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=https://github.com/Ramotion/circle-menu-android)
