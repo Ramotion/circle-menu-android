@@ -39,6 +39,27 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     private static final float DEFAULT_DISTANCE = DEFAULT_BUTTON_SIZE * 1.5f;
     private static final float DEFAULT_RING_SCALE_RATIO = 1.3f;
 
+    private final List<View> mButtons = new ArrayList<>();
+    private final Rect mButtonRect = new Rect();
+
+    private FloatingActionButton mMenuButton;
+    private RingEffectView mRingView;
+
+    private boolean mClosedState = true;
+    private boolean mIsAnimating = false;
+
+    private int mIconMenu;
+    private int mIconClose;
+    private int mDurationRing;
+    private int mDurationOpen;
+    private int mDurationClose;
+    private int mDesiredSize;
+    private int mRingRadius;
+
+    private float mDistance;
+
+    private EventListener mListener;
+
     /**
      * CircleMenu event listener.
      */
@@ -81,27 +102,6 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
          */
         public void onButtonClickAnimationEnd(@NonNull CircleMenuView view, int buttonIndex) {}
     }
-
-    private EventListener mListener;
-
-    private FloatingActionButton mMenuButton;
-    private RingEffectView mRingView;
-
-    private boolean mClosedState = true;
-    private boolean mIsAnimating = false;
-
-    private int mIconMenu;
-    private int mIconClose;
-    private int mDurationRing;
-    private int mDurationOpen;
-    private int mDurationClose;
-    private int mDesiredSize;
-    private int mRingRadius;
-
-    private float mDistance;
-
-    private final List<View> mButtons = new ArrayList<>();
-    private final Rect mButtonRect = new Rect();
 
     public CircleMenuView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
