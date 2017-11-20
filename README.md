@@ -21,15 +21,13 @@ The [Android mockup](https://store.ramotion.com/product/samsung-galaxy-s8-mockup
 
 ## Requirements
 ​
-- Android 4.4 KitKat (API lvl 19) or greater
+- Android 4.1 Jelly Bean (API lvl 16) or greater
 - Your favorite IDE
 
 ## Installation
 ​
-<!-- TODO: add url -->
-Just download the package from [here]() and add it to your project classpath, or just use the maven repo:
+Just download the package from [here](http://central.maven.org/maven2/com/ramotion/circlemenu/circle-menu/0.1.0/circle-menu-0.1.0.aar) and add it to your project classpath, or just use the maven repo:
 
-<!-- TODO: add package -->
 Gradle:
 ```groovy
 compile 'com.ramotion.circlemenu:circle-menu:0.1.0'
