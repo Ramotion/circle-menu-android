@@ -38,6 +38,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     private static final int DEFAULT_BUTTON_SIZE = 56;
     private static final float DEFAULT_DISTANCE = DEFAULT_BUTTON_SIZE * 1.5f;
     private static final float DEFAULT_RING_SCALE_RATIO = 1.3f;
+    private static final float DEFAULT_CLOSE_ICON_ALPHA = 0.3f;
 
     private final List<View> mButtons = new ArrayList<>();
     private final Rect mButtonRect = new Rect();
@@ -204,20 +205,12 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             return;
         }
 
-        final float x = mMenuButton.getX();
-        final float y = mMenuButton.getY();
-
-        for (View button: mButtons) {
-            button.setX(x);
-            button.setY(y);
-        }
-
         mMenuButton.getContentRect(mButtonRect);
 
         mRingView.setStrokeWidth(mButtonRect.width());
         mRingView.setRadius(mRingRadius);
 
-        final LayoutParams lp = (LayoutParams) mRingView.getLayoutParams();//new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        final LayoutParams lp = (LayoutParams) mRingView.getLayoutParams();
         lp.width = right - left;
         lp.height = bottom - top;
         mRingView.setLayoutParams(lp);
@@ -251,6 +244,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     private void initLayout(@NonNull Context context) {
         LayoutInflater.from(context).inflate(R.layout.circle_menu, this, true);
 
+        setWillNotDraw(true);
         setClipChildren(false);
         setClipToPadding(false);
 
@@ -325,6 +319,20 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
 
             addView(button);
             mButtons.add(button);
+        }
+    }
+
+    private void offsetAndScaleButtons(float centerX, float centerY, float angleStep, float offset, float scale) {
+        for (int i = 0, cnt = mButtons.size(); i < cnt; i++) {
+            final float angle = angleStep * i - 90;
+            final float x = (float) Math.cos(Math.toRadians(angle)) * offset;
+            final float y = (float) Math.sin(Math.toRadians(angle)) * offset;
+
+            final View button = mButtons.get(i);
+            button.setX(centerX + x);
+            button.setY(centerY + y);
+            button.setScaleX(1.0f * scale);
+            button.setScaleY(1.0f * scale);
         }
     }
 
@@ -417,7 +425,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     private Animator getOpenMenuAnimation() {
         mClosedState = false;
 
-        final ObjectAnimator alphaAnimation = ObjectAnimator.ofFloat(mMenuButton, "alpha", 0.3f);
+        final ObjectAnimator alphaAnimation = ObjectAnimator.ofFloat(mMenuButton, "alpha", DEFAULT_CLOSE_ICON_ALPHA);
 
         final Keyframe kf0 = Keyframe.ofFloat(0f, 0f);
         final Keyframe kf1 = Keyframe.ofFloat(0.5f, 60f);
@@ -457,18 +465,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 final float fraction = valueAnimator.getAnimatedFraction();
                 final float value = (float)valueAnimator.getAnimatedValue();
-
-                for (int i = 0; i < buttonsCount; i++) {
-                    final float angle = angleStep * i - 90;
-                    final float x = (float) Math.cos(Math.toRadians(angle)) * value;
-                    final float y = (float) Math.sin(Math.toRadians(angle)) * value;
-
-                    final View button = mButtons.get(i);
-                    button.setX(centerX + x);
-                    button.setY(centerY + y);
-                    button.setScaleX(1.0f * fraction);
-                    button.setScaleY(1.0f * fraction);
-                }
+                offsetAndScaleButtons(centerX, centerY, angleStep, value, fraction);
             }
         });
 
@@ -630,6 +627,61 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
      */
     public EventListener getEventListener() {
         return mListener;
+    }
+
+    private void openOrClose(boolean open, boolean animate) {
+        if (mIsAnimating) {
+            return;
+        }
+
+        if (open && !mClosedState) {
+            return;
+        }
+
+        if (!open && mClosedState) {
+            return;
+        }
+
+        if (animate) {
+            mMenuButton.performClick();
+        } else {
+            mClosedState = !open;
+
+            final float centerX = mMenuButton.getX();
+            final float centerY = mMenuButton.getY();
+
+            final int buttonsCount = mButtons.size();
+            final float angleStep = 360f / buttonsCount;
+
+            final float offset = open ? mDistance : 0f;
+            final float scale = open ? 1f : 0f;
+
+            mMenuButton.setImageResource(open ? mIconClose : mIconMenu);
+            mMenuButton.setAlpha(open ? DEFAULT_CLOSE_ICON_ALPHA : 1f);
+
+            final int visibility = open ? View.VISIBLE : View.INVISIBLE;
+            for (View view: mButtons) {
+                view.setVisibility(visibility);
+            }
+
+            offsetAndScaleButtons(centerX, centerY, angleStep, offset, scale);
+        }
+    }
+
+    /**
+     * Open menu programmatically
+     * @param animate open with animation or not
+     */
+    public void open(boolean animate) {
+        openOrClose(true, animate);
+    }
+
+    /**
+     * Close menu programmatically
+     * @param animate close with animation or not
+     */
+    public void close(boolean animate) {
+        openOrClose(false, animate);
     }
 
 }

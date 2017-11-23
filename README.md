@@ -119,6 +119,9 @@ menu.setEventListener(new CircleMenuView.EventListener() {
 });
 ```
 
+You can use `open(boolean animate)` and `close(boolean animate)` methods,
+to open and close menu programmatically
+
 Here are the attributes you can specify through XML or related setters:
 * `button_icons` - Array of buttons icons.
 * `button_colors` - Array of buttons colors.
