@@ -233,6 +233,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             }
             @Override
             public void onAnimationEnd(Animator animation) {
+                mClosedState = true;
                 if (mListener != null) {
                     mListener.onButtonClickAnimationEnd(CircleMenuView.this, mButtons.indexOf(view));
                 }
@@ -284,6 +285,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
                 } else {
                     mListener.onMenuCloseAnimationEnd(CircleMenuView.this);
                 }
+                mClosedState = !mClosedState;
             }
         };
 
@@ -423,8 +425,6 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     }
 
     private Animator getOpenMenuAnimation() {
-        mClosedState = false;
-
         final ObjectAnimator alphaAnimation = ObjectAnimator.ofFloat(mMenuButton, "alpha", DEFAULT_CLOSE_ICON_ALPHA);
 
         final Keyframe kf0 = Keyframe.ofFloat(0f, 0f);
@@ -486,8 +486,6 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     }
 
     private Animator getCloseMenuAnimation() {
-        mClosedState = true;
-
         final ObjectAnimator scaleX1 = ObjectAnimator.ofFloat(mMenuButton, "scaleX", 0f);
         final ObjectAnimator scaleY1 = ObjectAnimator.ofFloat(mMenuButton, "scaleY", 0f);
         final ObjectAnimator alpha1 = ObjectAnimator.ofFloat(mMenuButton, "alpha", 0f);
