@@ -26,22 +26,22 @@ The [Android mockup](https://store.ramotion.com/product/samsung-galaxy-s8-mockup
 
 ## Installation
 ​
-Just download the package from [here](http://central.maven.org/maven2/com/ramotion/circlemenu/circle-menu/0.1.0/circle-menu-0.1.0.aar) and add it to your project classpath, or just use the maven repo:
+Just download the package from [here](http://central.maven.org/maven2/com/ramotion/circlemenu/circle-menu/0.1.0/circle-menu-0.2.0.aar) and add it to your project classpath, or just use the maven repo:
 
 Gradle:
 ```groovy
-compile 'com.ramotion.circlemenu:circle-menu:0.1.0'
+compile 'com.ramotion.circlemenu:circle-menu:0.2.0'
 ```
 SBT:
 ```scala
-libraryDependencies += "com.ramotion.circlemenu" % "circle-menu" % "0.1.0"
+libraryDependencies += "com.ramotion.circlemenu" % "circle-menu" % "0.2.0"
 ```
 Maven:
 ```xml
 <dependency>
 	<groupId>com.ramotion.circlemenu</groupId>
 	<artifactId>circle-menu</artifactId>
-	<version>0.1.0</version>
+	<version>0.2.0</version>
 </dependency>
 ```
 ​
