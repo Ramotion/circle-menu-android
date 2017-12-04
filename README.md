@@ -26,22 +26,22 @@ The [Android mockup](https://store.ramotion.com/product/samsung-galaxy-s8-mockup
 
 ## Installation
 ​
-Just download the package from [here](http://central.maven.org/maven2/com/ramotion/circlemenu/circle-menu/0.1.0/circle-menu-0.1.0.aar) and add it to your project classpath, or just use the maven repo:
+Just download the package from [here](http://central.maven.org/maven2/com/ramotion/circlemenu/circle-menu/0.1.0/circle-menu-0.2.0.aar) and add it to your project classpath, or just use the maven repo:
 
 Gradle:
 ```groovy
-compile 'com.ramotion.circlemenu:circle-menu:0.1.0'
+compile 'com.ramotion.circlemenu:circle-menu:0.2.0'
 ```
 SBT:
 ```scala
-libraryDependencies += "com.ramotion.circlemenu" % "circle-menu" % "0.1.0"
+libraryDependencies += "com.ramotion.circlemenu" % "circle-menu" % "0.2.0"
 ```
 Maven:
 ```xml
 <dependency>
 	<groupId>com.ramotion.circlemenu</groupId>
 	<artifactId>circle-menu</artifactId>
-	<version>0.1.0</version>
+	<version>0.2.0</version>
 </dependency>
 ```
 ​
@@ -136,7 +136,7 @@ Here are the attributes you can specify through XML or related setters:
 ## License
 ​
 CircleMenu for Android is released under the MIT license.
-See [LICENSE](./LICENSE.md) for details.
+See [LICENSE](./LICENSE) for details.
 
 # Get the Showroom App for Android to give it a try
 Try our UI components in our mobile app. Contact us if interested.
@@ -147,6 +147,7 @@ Try our UI components in our mobile app. Contact us if interested.
 <img src="https://github.com/ramotion/gliding-collection/raw/master/contact_our_team@2x.png" width="187" height="34"></a>
 <br>
 <br>
+
 ## Follow us
 
 [![Twitter URL](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=https://github.com/Ramotion/circle-menu-android)
