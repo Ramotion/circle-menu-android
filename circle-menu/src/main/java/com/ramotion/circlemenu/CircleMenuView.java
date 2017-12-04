@@ -262,29 +262,24 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         final AnimatorListenerAdapter animListener = new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                if (mListener == null) {
-                    return;
-                }
-
-                if (mClosedState) {
-                    mListener.onMenuOpenAnimationStart(CircleMenuView.this);
-                } else {
-                    mListener.onMenuCloseAnimationStart(CircleMenuView.this);
+                if (mListener != null) {
+                    if (mClosedState) {
+                        mListener.onMenuOpenAnimationStart(CircleMenuView.this);
+                    } else {
+                        mListener.onMenuCloseAnimationStart(CircleMenuView.this);
+                    }
                 }
             }
             @Override
             public void onAnimationEnd(Animator animation) {
-                animation.removeListener(this);
-
-                if (mListener == null) {
-                    return;
+                if (mListener != null) {
+                    if (mClosedState) {
+                        mListener.onMenuOpenAnimationEnd(CircleMenuView.this);
+                    } else {
+                        mListener.onMenuCloseAnimationEnd(CircleMenuView.this);
+                    }
                 }
 
-                if (mClosedState) {
-                    mListener.onMenuOpenAnimationEnd(CircleMenuView.this);
-                } else {
-                    mListener.onMenuCloseAnimationEnd(CircleMenuView.this);
-                }
                 mClosedState = !mClosedState;
             }
         };
