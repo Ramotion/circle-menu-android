@@ -3,7 +3,7 @@ apply plugin: 'signing'
 apply plugin: 'com.bmuschko.nexus'
 
 group = 'com.ramotion.circlemenu'
-version = '0.2.1'
+version = '0.3.0'
 
 android {
     compileSdkVersion 26
@@ -12,7 +12,7 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 3
+        versionCode 4
         versionName version
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
