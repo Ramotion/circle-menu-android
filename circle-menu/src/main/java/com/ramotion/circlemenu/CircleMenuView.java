@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.support.annotation.AttrRes;
+import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -116,8 +117,8 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         }
 
         final int menuButtonColor;
-        final List<Integer> icons;
-        final List<Integer> colors;
+        final int[] icons;
+        final int[] colors;
 
         final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.CircleMenuView, 0, 0);
         try {
@@ -129,12 +130,12 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
                 final int[] colorsIds = getResources().getIntArray(colorArrayId);
                 final int buttonsCount = Math.min(iconsIds.length(), colorsIds.length);
 
-                icons = new ArrayList<>(buttonsCount);
-                colors = new ArrayList<>(buttonsCount);
+                icons = new int[buttonsCount];
+                colors = new int[buttonsCount];
 
                 for (int i = 0; i < buttonsCount; i++) {
-                    icons.add(iconsIds.getResourceId(i, -1));
-                    colors.add(colorsIds[i]);
+                    icons[i] = (iconsIds.getResourceId(i, -1));
+                    colors[i] = (colorsIds[i]);
                 }
             } finally {
                 iconsIds.recycle();
@@ -161,13 +162,26 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         initButtons(context, icons, colors);
     }
 
+    private static int[] toInts(List<Integer> intList) {
+        int[] ints = new int[intList.size()];
+        for (int i = 0; i < intList.size(); i++) {
+            ints[i] = intList.get(i);
+        }
+        return ints;
+    }
+
+    public CircleMenuView(@NonNull Context context, @NonNull @DrawableRes List<Integer> iconList, @NonNull @ColorInt List<Integer> colorList) {
+        this(context,toInts(iconList),toInts(colorList));
+    }
+
     /**
      * Constructor for creation CircleMenuView in code, not in xml-layout.
+     *
      * @param context current context, will be used to access resources.
-     * @param icons buttons icons resource ids array. Items must be @DrawableRes.
-     * @param colors buttons colors resource ids array. Items must be @DrawableRes.
+     * @param icons   buttons icon resource @DrawableRes array.
+     * @param colors  buttons color @ColorInt array.
      */
-    public CircleMenuView(@NonNull Context context, @NonNull List<Integer> icons, @NonNull List<Integer> colors) {
+    public CircleMenuView(@NonNull Context context, @NonNull @DrawableRes int[] icons, @NonNull @ColorInt int[] colors) {
         super(context);
 
         final float density = context.getResources().getDisplayMetrics().density;
@@ -302,12 +316,12 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         });
     }
 
-    private void initButtons(@NonNull Context context, @NonNull List<Integer> icons, @NonNull List<Integer> colors) {
-        final int buttonsCount = Math.min(icons.size(), colors.size());
+    private void initButtons(@NonNull Context context, @NonNull int[] icons, @NonNull int[] colors) {
+        final int buttonsCount = Math.min(icons.length, colors.length);
         for (int i = 0; i < buttonsCount; i++) {
             final FloatingActionButton button = new FloatingActionButton(context);
-            button.setImageResource(icons.get(i));
-            button.setBackgroundTintList(ColorStateList.valueOf(colors.get(i)));
+            button.setImageResource(icons[i]);
+            button.setBackgroundTintList(ColorStateList.valueOf(colors[i]));
             button.setClickable(true);
             button.setOnClickListener(this);
             button.setScaleX(0);
