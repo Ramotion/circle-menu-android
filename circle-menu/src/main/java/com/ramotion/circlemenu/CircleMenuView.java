@@ -213,7 +213,6 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         final LayoutParams lp = (LayoutParams) mRingView.getLayoutParams();
         lp.width = right - left;
         lp.height = bottom - top;
-        mRingView.setLayoutParams(lp);
     }
 
     @Override
