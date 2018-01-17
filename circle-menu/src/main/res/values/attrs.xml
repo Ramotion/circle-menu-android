@@ -13,6 +13,8 @@
         <attr name="icon_color" format="color"/>
         <!-- Ring effect duration. -->
         <attr name="duration_ring" format="integer"/>
+        <!-- On long click ring effect duration. -->
+        <attr name="long_click_duration_ring" format="integer"/>
         <!-- Menu opening animation duration. -->
         <attr name="duration_open" format="integer"/>
         <!-- Menu closing animation duration. -->

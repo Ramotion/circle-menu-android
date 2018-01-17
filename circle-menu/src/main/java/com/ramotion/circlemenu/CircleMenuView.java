@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * CircleMenuView
  */
-public class CircleMenuView extends FrameLayout implements View.OnClickListener {
+public class CircleMenuView extends FrameLayout {
 
     private static final int DEFAULT_BUTTON_SIZE = 56;
     private static final float DEFAULT_DISTANCE = DEFAULT_BUTTON_SIZE * 1.5f;
@@ -52,6 +52,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
     private int mIconMenu;
     private int mIconClose;
     private int mDurationRing;
+    private int mLongClickDurationRing;
     private int mDurationOpen;
     private int mDurationClose;
     private int mDesiredSize;
@@ -102,6 +103,86 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
          * @param buttonIndex - clicked button zero-based index.
          */
         public void onButtonClickAnimationEnd(@NonNull CircleMenuView view, int buttonIndex) {}
+
+        /**
+         * Invoked on button long click. Invokes {@see onButtonLongClickAnimationStart} and {@see onButtonLongClickAnimationEnd}
+         * if returns true.
+         * @param view current CircleMenuView instance.
+         * @param buttonIndex clicked button zero-based index.
+         * @return  true if the callback consumed the long click, false otherwise.
+         */
+        public boolean onButtonLongClick(@NonNull CircleMenuView view, int buttonIndex) { return false; }
+
+        /**
+         * Invoked on button long click, before animation start.
+         * @param view - current CircleMenuView instance.
+         * @param buttonIndex - clicked button zero-based index.
+         */
+        public void onButtonLongClickAnimationStart(@NonNull CircleMenuView view, int buttonIndex) {}
+
+        /**
+         * Invoked on button long click, after animation end.
+         * @param view - current CircleMenuView instance.
+         * @param buttonIndex - clicked button zero-based index.
+         */
+        public void onButtonLongClickAnimationEnd(@NonNull CircleMenuView view, int buttonIndex) {}
+    }
+
+    private class OnButtonClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(final View view) {
+            if (mIsAnimating) {
+                return;
+            }
+
+            final Animator click = getButtonClickAnimation((FloatingActionButton)view);
+            click.setDuration(mDurationRing);
+            click.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    if (mListener != null) {
+                        mListener.onButtonClickAnimationStart(CircleMenuView.this, mButtons.indexOf(view));
+                    }
+                }
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mClosedState = true;
+                    if (mListener != null) {
+                        mListener.onButtonClickAnimationEnd(CircleMenuView.this, mButtons.indexOf(view));
+                    }
+                }
+            });
+            click.start();
+        }
+    }
+
+    private class OnButtonLongClickListener implements View.OnLongClickListener {
+        @Override
+        public boolean onLongClick(final View view) {
+            if (mListener == null) {
+                return false;
+            }
+
+            final boolean result =  mListener.onButtonLongClick(CircleMenuView.this, mButtons.indexOf(view));
+            if (result && !mIsAnimating) {
+                final Animator click = getButtonClickAnimation((FloatingActionButton)view);
+                click.setDuration(mLongClickDurationRing);
+                click.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        mListener.onButtonLongClickAnimationStart(CircleMenuView.this, mButtons.indexOf(view));
+                    }
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mClosedState = true;
+                        mListener.onButtonLongClickAnimationEnd(CircleMenuView.this, mButtons.indexOf(view));
+                    }
+                });
+                click.start();
+            }
+
+            return result;
+        }
     }
 
     public CircleMenuView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -144,6 +225,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             mIconClose = a.getResourceId(R.styleable.CircleMenuView_icon_close, R.drawable.ic_close_black_24dp);
 
             mDurationRing = a.getInteger(R.styleable.CircleMenuView_duration_ring, getResources().getInteger(android.R.integer.config_mediumAnimTime));
+            mLongClickDurationRing = a.getInteger(R.styleable.CircleMenuView_long_click_duration_ring, getResources().getInteger(android.R.integer.config_longAnimTime));
             mDurationOpen = a.getInteger(R.styleable.CircleMenuView_duration_open, getResources().getInteger(android.R.integer.config_mediumAnimTime));
             mDurationClose = a.getInteger(R.styleable.CircleMenuView_duration_close, getResources().getInteger(android.R.integer.config_mediumAnimTime));
 
@@ -177,6 +259,7 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         mIconClose = R.drawable.ic_close_black_24dp;
 
         mDurationRing = getResources().getInteger(android.R.integer.config_mediumAnimTime);
+        mLongClickDurationRing = getResources().getInteger(android.R.integer.config_longAnimTime);
         mDurationOpen = getResources().getInteger(android.R.integer.config_mediumAnimTime);
         mDurationClose = getResources().getInteger(android.R.integer.config_mediumAnimTime);
 
@@ -213,32 +296,6 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
         final LayoutParams lp = (LayoutParams) mRingView.getLayoutParams();
         lp.width = right - left;
         lp.height = bottom - top;
-    }
-
-    @Override
-    public void onClick(final View view) {
-        if (mIsAnimating) {
-            return;
-        }
-
-        final Animator click = getButtonClickAnimation((FloatingActionButton)view);
-        click.setDuration(mDurationRing);
-        click.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                if (mListener != null) {
-                    mListener.onButtonClickAnimationStart(CircleMenuView.this, mButtons.indexOf(view));
-                }
-            }
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mClosedState = true;
-                if (mListener != null) {
-                    mListener.onButtonClickAnimationEnd(CircleMenuView.this, mButtons.indexOf(view));
-                }
-            }
-        });
-        click.start();
     }
 
     private void initLayout(@NonNull Context context) {
@@ -308,7 +365,8 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
             button.setImageResource(icons.get(i));
             button.setBackgroundTintList(ColorStateList.valueOf(colors.get(i)));
             button.setClickable(true);
-            button.setOnClickListener(this);
+            button.setOnClickListener(new OnButtonClickListener());
+            button.setOnLongClickListener(new OnButtonLongClickListener());
             button.setScaleX(0);
             button.setScaleY(0);
             button.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -586,6 +644,22 @@ public class CircleMenuView extends FrameLayout implements View.OnClickListener 
      */
     public int getDurationRing() {
         return mDurationRing;
+    }
+
+    /**
+     * See {@link R.styleable#CircleMenuView_long_click_duration_ring}
+     * @return current long click ring animation duration.
+     */
+    public int getLongClickDurationRing() {
+        return mLongClickDurationRing;
+    }
+
+    /**
+     * See {@link R.styleable#CircleMenuView_long_click_duration_ring}
+     * @param duration long click ring animation duration in milliseconds.
+     */
+    public void setLongClickDurationRing(int duration) {
+        mLongClickDurationRing = duration;
     }
 
     /**
