@@ -1,5 +1,6 @@
 [![header](./header.png)](https://ramotion.com?utm_source=gthb&utm_medium=special&utm_campaign=circle-menu-android-logo)
-![Animation](./preview.gif)
+<img src="https://github.com/Ramotion/circle-menu-android/blob/master/preview.gif" width="600" height="450" />
+<br><br/>
 
 # CircleMenu for Android
 [![Twitter](https://img.shields.io/badge/Twitter-@Ramotion-blue.svg?style=flat)](http://twitter.com/Ramotion)
