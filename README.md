@@ -135,6 +135,10 @@ Here are the attributes you can specify through XML or related setters:
 * `duration_close` - Menu closing animation duration.
 * `distance` - Distance between center button and buttons
 
+<br>
+
+This library is a part of a <a href="https://github.com/Ramotion/android-ui-animation-components-and-libraries"><b>selection of our best UI open-source projects.</b></a>
+
 ## License
 ​
 CircleMenu for Android is released under the MIT license.
