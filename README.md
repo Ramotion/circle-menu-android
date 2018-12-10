@@ -16,7 +16,7 @@
 
 **Looking for developers for your project?** 
 
-<a href="mailto:alex.a@ramotion.com?subject=Project%20inquiry%20from%20Github" > <img src="https://github.com/Ramotion/navigation-stack/raw/master/contact_our_team@2x.png" width="150" height="30"></a>
+<a href="https://dev.ramotion.com?utm_source=gthb&utm_medium=repo&utm_campaign=circle-menu-android" > <img src="https://github.com/Ramotion/navigation-stack/raw/master/contact_our_team@2x.png" width="150" height="30"></a>
 
 
 The [Android mockup](https://store.ramotion.com/product/samsung-galaxy-s8-mockups?utm_source=gthb&utm_medium=special&utm_campaign=circle-menu-android) available [here](https://store.ramotion.com/product/samsung-galaxy-s8-mockups?utm_source=gthb&utm_medium=special&utm_campaign=circle-menu-android).
@@ -149,7 +149,7 @@ Try our UI components in our mobile app. Contact us if interested.
 
 <a href="https://play.google.com/store/apps/details?id=com.ramotion.showroom" >
 <img src="https://raw.githubusercontent.com/Ramotion/react-native-circle-menu/master/google_play@2x.png" width="104" height="34"></a>
-<a href="mailto:alex.a@ramotion.com?subject=Project%20inquiry%20from%20Github"> 
+<a href="https://dev.ramotion.com?utm_source=gthb&utm_medium=repo&utm_campaign=circle-menu-android"> 
 <img src="https://github.com/ramotion/gliding-collection/raw/master/contact_our_team@2x.png" width="187" height="34"></a>
 <br>
 <br>
