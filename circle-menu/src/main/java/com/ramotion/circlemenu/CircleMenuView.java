@@ -14,20 +14,22 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
-import android.support.annotation.AttrRes;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.AttrRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
 
 
 /**
