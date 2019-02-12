@@ -63,6 +63,12 @@ modifyPom {
                 name 'Dmitry Grishechkin'
                 email 'dvgrishechkin@yandex.ru'
             }
+
+            developer {
+                id 'golovin47'
+                name 'Ivan Golovin'
+                email 'golovinivans@gmail.com'
+            }
         }
     }
 }
