@@ -38,7 +38,7 @@ Just download the package from [here](http://central.maven.org/maven2/com/ramoti
 
 Gradle:
 ```groovy
-compile 'com.ramotion.circlemenu:circle-menu:0.3.2'
+implementation 'com.ramotion.circlemenu:circle-menu:0.3.2'
 ```
 SBT:
 ```scala
