@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -371,8 +372,9 @@ public class CircleMenuView extends FrameLayout {
             button.setOnLongClickListener(new OnButtonLongClickListener());
             button.setScaleX(0);
             button.setScaleY(0);
+            button.setScaleType(ImageView.ScaleType.CENTER);
             button.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
+            button.setSize(FloatingActionButton.SIZE_NORMAL);
             addView(button);
             mButtons.add(button);
         }
@@ -380,7 +382,7 @@ public class CircleMenuView extends FrameLayout {
 
     private void offsetAndScaleButtons(float centerX, float centerY, float angleStep, float offset, float scale) {
         for (int i = 0, cnt = mButtons.size(); i < cnt; i++) {
-            final float angle = angleStep * i - 90;
+            final float angle = angleStep * i - 180;
             final float x = (float) Math.cos(Math.toRadians(angle)) * offset;
             final float y = (float) Math.sin(Math.toRadians(angle)) * offset;
 
@@ -502,7 +504,7 @@ public class CircleMenuView extends FrameLayout {
         final float centerY = mMenuButton.getY();
 
         final int buttonsCount = mButtons.size();
-        final float angleStep = 360f / buttonsCount;
+        final float angleStep = 180f / (buttonsCount - 1);
 
         final ValueAnimator buttonsAppear = ValueAnimator.ofFloat(0f, mDistance);
         buttonsAppear.setInterpolator(new OvershootInterpolator());
