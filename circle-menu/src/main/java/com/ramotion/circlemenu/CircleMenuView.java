@@ -396,9 +396,9 @@ public class CircleMenuView extends FrameLayout {
 
     private Animator getButtonClickAnimation(final @NonNull FloatingActionButton button) {
         final int buttonNumber = mButtons.indexOf(button) + 1;
-        final float stepAngle = 360f / mButtons.size();
-        final float rOStartAngle = (270 - stepAngle + stepAngle * buttonNumber);
-        final float rStartAngle = rOStartAngle > 360 ? rOStartAngle % 360 : rOStartAngle;
+        final float stepAngle = 180f / (mButtons.size() -1);
+        final float rOStartAngle = (180-stepAngle + stepAngle * buttonNumber);
+        final float rStartAngle = rOStartAngle > 360 ? rOStartAngle % 180 : rOStartAngle;
 
         final float x = (float) Math.cos(Math.toRadians(rStartAngle)) * mDistance;
         final float y = (float) Math.sin(Math.toRadians(rStartAngle)) * mDistance;
@@ -408,7 +408,9 @@ public class CircleMenuView extends FrameLayout {
         button.setPivotX(pivotX - x);
         button.setPivotY(pivotY - y);
 
-        final ObjectAnimator rotateButton = ObjectAnimator.ofFloat(button, "rotation", 0f, 360f);
+        final float pathAngle = 360;
+
+        final ObjectAnimator rotateButton = ObjectAnimator.ofFloat(button, "rotation", 0f, pathAngle);
         rotateButton.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -427,7 +429,7 @@ public class CircleMenuView extends FrameLayout {
             mRingView.setStrokeColor(csl.getDefaultColor());
         }
 
-        final ObjectAnimator ring = ObjectAnimator.ofFloat(mRingView, "angle", 360);
+        final ObjectAnimator ring = ObjectAnimator.ofFloat(mRingView, "angle", pathAngle);
         final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mRingView, "scaleX", 1f, DEFAULT_RING_SCALE_RATIO);
         final ObjectAnimator scaleY = ObjectAnimator.ofFloat(mRingView, "scaleY", 1f, DEFAULT_RING_SCALE_RATIO);
         final ObjectAnimator visible = ObjectAnimator.ofFloat(mRingView, "alpha", 1f, 0f);
@@ -721,7 +723,7 @@ public class CircleMenuView extends FrameLayout {
             final float centerY = mMenuButton.getY();
 
             final int buttonsCount = mButtons.size();
-            final float angleStep = 360f / buttonsCount;
+            final float angleStep = 180f / (buttonsCount - 1);
 
             final float offset = open ? mDistance : 0f;
             final float scale = open ? 1f : 0f;
