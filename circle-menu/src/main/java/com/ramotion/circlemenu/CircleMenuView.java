@@ -46,7 +46,7 @@ public class CircleMenuView extends FrameLayout {
     private final List<View> mButtons = new ArrayList<>();
     private final Rect mButtonRect = new Rect();
 
-    private FloatingActionButton mMenuButton;
+    private CounterFab mMenuButton;
     private RingEffectView mRingView;
 
     private boolean mClosedState = true;
@@ -675,6 +675,10 @@ public class CircleMenuView extends FrameLayout {
     public void setDistance(float distance) {
         mDistance = distance;
         invalidate();
+    }
+
+    public void setCounter(int count){
+        mMenuButton.setCount(count);
     }
 
     /**

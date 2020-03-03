@@ -11,11 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.ramotion.circlemenu.CounterFab
         android:id="@+id/circle_menu_main_button"
         android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:badgeBackgroundColor="#ff0000"
         android:src="@drawable/ic_menu_black_24dp"
         app:backgroundTint="@android:color/white"/>
 

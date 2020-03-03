@@ -22,4 +22,15 @@
         <!-- Distance between center button and buttons. -->
         <attr name="distance" format="dimension"/>
     </declare-styleable>
+
+    <declare-styleable name="CounterFab">
+        <attr name="badgeTextColor" format="color" />
+        <attr name="badgeBackgroundColor" format="color" />
+        <attr name="badgePosition" format="enum">
+            <enum name="RightTop" value="0" />
+            <enum name="LeftBottom" value="1" />
+            <enum name="LeftTop" value="2" />
+            <enum name="RightBottom" value="3" />
+        </attr>
+    </declare-styleable>
 </resources>
