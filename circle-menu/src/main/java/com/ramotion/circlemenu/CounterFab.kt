@@ -117,6 +117,10 @@ class CounterFab @JvmOverloads constructor(
         updateCountText()
     }
     
+    fun setBadgeBackgroundColor(color: Int){
+        circlePaint.color = color
+    }
+    
     private fun updateCountText() {
         countText = if (isSizeMini) when {
             count > MINI_MAX_COUNT -> MINI_MAX_COUNT_TEXT

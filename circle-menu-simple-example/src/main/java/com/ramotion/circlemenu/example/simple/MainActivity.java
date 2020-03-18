@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
         final CircleMenuView menu = findViewById(R.id.circle_menu);
         menu.setCounter(999);
+        menu.setMenuButtonCounter(6, 0);
         menu.setEventListener(new CircleMenuView.EventListener() {
             @Override
             public void onMenuOpenAnimationStart(@NonNull CircleMenuView view) {

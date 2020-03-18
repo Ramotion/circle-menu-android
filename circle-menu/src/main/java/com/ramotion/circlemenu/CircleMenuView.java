@@ -43,7 +43,8 @@ public class CircleMenuView extends FrameLayout {
     private static final float DEFAULT_RING_SCALE_RATIO = 1.3f;
     private static final float DEFAULT_CLOSE_ICON_ALPHA = 0.3f;
 
-    private final List<View> mButtons = new ArrayList<>();
+    private final List<CounterFab> mButtons = new ArrayList<>();
+    private final List<Integer> mButtonCounts = new ArrayList<>();
     private final Rect mButtonRect = new Rect();
 
     private CounterFab mMenuButton;
@@ -364,7 +365,7 @@ public class CircleMenuView extends FrameLayout {
     private void initButtons(@NonNull Context context, @NonNull List<Integer> icons, @NonNull List<Integer> colors) {
         final int buttonsCount = Math.min(icons.size(), colors.size());
         for (int i = 0; i < buttonsCount; i++) {
-            final FloatingActionButton button = new FloatingActionButton(context);
+            final CounterFab button = new CounterFab(context);
             button.setImageResource(icons.get(i));
             button.setBackgroundTintList(ColorStateList.valueOf(colors.get(i)));
             button.setClickable(true);
@@ -374,9 +375,10 @@ public class CircleMenuView extends FrameLayout {
             button.setScaleY(0);
             button.setScaleType(ImageView.ScaleType.CENTER);
             button.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-            button.setSize(FloatingActionButton.SIZE_NORMAL);
+            button.setBadgeBackgroundColor(Color.RED);
             addView(button);
             mButtons.add(button);
+            mButtonCounts.add(0);
         }
     }
 
@@ -679,6 +681,10 @@ public class CircleMenuView extends FrameLayout {
 
     public void setCounter(int count){
         mMenuButton.setCount(count);
+    }
+
+    public void setMenuButtonCounter(int count, int index){
+        mButtons.get(index).setCount(count);
     }
 
     /**
